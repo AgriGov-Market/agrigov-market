@@ -1,0 +1,34 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block title %}Home - AgriGov Market{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>🌾 Connect. Trade. Deliver.</h1>
+    <p>The national platform connecting farmers, buyers, and transporters in Algeria</p>
+    <div class="hero-buttons">
+        <a href="/register/" class="btn btn-primary">🚀 Get Started</a>
+        <a href="/login/" class="btn btn-outline">🔑 Login</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 class="text-center">Latest Products</h2>
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-card-content">
+                <h4>{{ product.name }}</h4>
+                <p><i class="fas fa-tractor"></i> {{ product.farm.name }}</p>
+                <p><i class="fas fa-weight-hanging"></i> {{ product.quantity }} {{ product.unit }}</p>
+                <p><i class="fas fa-tag"></i> {{ product.price_per_unit }} DZD/{{ product.unit }}</p>
+                <span class="badge">{{ product.get_quality_display }}</span>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No products available yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

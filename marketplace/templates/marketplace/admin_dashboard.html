@@ -1,0 +1,81 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - AgriGov Market{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="sidebar">
+        <h3>🏛️ Ministry Admin</h3>
+        <a href="/dashboard/"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/official-prices/"><i class="fas fa-chart-line"></i> Official Prices</a>
+        <a href="/admin/"><i class="fas fa-cog"></i> Django Admin</a>
+        <a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    
+    <div class="main-content">
+        <h2>Welcome, {{ user.username }}! 🏛️</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_products }}</div>
+                <div class="stat-label">Products Listed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_orders }}</div>
+                <div class="stat-label">Orders Placed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_revenue }} DZD</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3><i class="fas fa-user-check"></i> Pending Approvals</h3>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Username</th><th>Role</th><th>Email</th><th>Action</th></tr></thead>
+                    <tbody>
+                        {% for profile in pending_users %}
+                        <tr>
+                            <td>{{ profile.user.username }}</td>
+                            <td>{{ profile.get_role_display }}</td>
+                            <td>{{ profile.user.email }}</td>
+                            <td><a href="/approve-user/{{ profile.user.id }}/" class="btn btn-primary">Approve</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No pending users.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3><i class="fas fa-box"></i> All Products</h3>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Product</th><th>Farmer</th><th>Price</th><th>Available</th></tr></thead>
+                    <tbody>
+                        {% for product in all_products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.farmer.username }}</td>
+                            <td>{{ product.price_per_unit }} DZD</td>
+                            <td>{% if product.available %}✅{% else %}❌{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No products.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block title %}All Products - AgriGov Market{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center">🌾 All Available Products</h2>
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-card-content">
+                <h4>{{ product.name }}</h4>
+                <p><i class="fas fa-tractor"></i> {{ product.farmer.username }}</p>
+                <p><i class="fas fa-map-marker-alt"></i> {{ product.farm.location }}</p>
+                <p><i class="fas fa-weight-hanging"></i> {{ product.quantity }} {{ product.unit }}</p>
+                <p><i class="fas fa-tag"></i> {{ product.price_per_unit }} DZD/{{ product.unit }}</p>
+                <p><i class="fas fa-star"></i> {{ product.get_quality_display }}</p>
+                <a href="/place-order/{{ product.id }}/" class="btn btn-primary">Order Now</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No products available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

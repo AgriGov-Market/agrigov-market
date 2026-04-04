@@ -1,0 +1,28 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block title %}Update Delivery - AgriGov Market{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center"><i class="fas fa-truck"></i> Update Delivery Status</h2>
+        
+        <div class="card" style="background: #fff3e0; margin-bottom: 1.5rem;">
+            <p><strong>Order #{{ delivery.order.id }}</strong></p>
+            <p><i class="fas fa-map-marker-alt"></i> From: {{ delivery.pickup_location }}</p>
+            <p><i class="fas fa-flag-checkered"></i> To: {{ delivery.dropoff_location }}</p>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label><i class="fas fa-tasks"></i> Status</label>
+                {{ form.status }}
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Update Status</button>
+        </form>
+        <p class="text-center mt-2"><a href="/dashboard/">← Back to Dashboard</a></p>
+    </div>
+</div>
+{% endblock %}

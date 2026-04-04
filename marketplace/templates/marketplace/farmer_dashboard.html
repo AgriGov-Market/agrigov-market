@@ -1,0 +1,106 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block title %}Farmer Dashboard - AgriGov Market{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="sidebar">
+        <h3>🌾 Farmer Panel</h3>
+        <a href="/dashboard/"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="/add-farm/"><i class="fas fa-tractor"></i> Add Farm</a>
+        <a href="/add-product/"><i class="fas fa-box"></i> Add Product</a>
+        <a href="/product-list/"><i class="fas fa-search"></i> Browse Products</a>
+        <a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+    
+    <div class="main-content">
+        <h2>Welcome back, {{ user.username }}! 👨‍🌾</h2>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ farms|length }}</div>
+                <div class="stat-label">Farms</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ products|length }}</div>
+                <div class="stat-label">Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ orders|length }}</div>
+                <div class="stat-label">Orders</div>
+            </div>
+        </div>
+        
+        <!-- Farms Section -->
+        <div class="card">
+            <h3><i class="fas fa-tractor"></i> Your Farms</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Farm Name</th><th>Location</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for farm in farms %}
+                        <tr>
+                            <td>{{ farm.name }}</td>
+                            <td>{{ farm.location }}</td>
+                            <td><a href="/add-product/" class="btn btn-primary">Add Product</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">No farms yet. <a href="/add-farm/">Add one</a></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Products Section -->
+        <div class="card">
+            <h3><i class="fas fa-box"></i> Your Products</h3>
+            <a href="/add-product/" class="btn btn-primary mb-2">+ Add New Product</a>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Name</th><th>Quantity</th><th>Price</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.quantity }} {{ product.unit }}</td>
+                            <td>{{ product.price_per_unit }} DZD</td>
+                            <td>{% if product.available %}✅ Available{% else %}❌ Sold{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">No products yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Orders Section -->
+        <div class="card">
+            <h3><i class="fas fa-shopping-cart"></i> Incoming Orders</h3>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Buyer</th><th>Product</th><th>Quantity</th><th>Total</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.buyer.username }}</td>
+                            <td>{{ order.product.name }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.total_price }} DZD</td>
+                            <td><span class="badge">{{ order.get_status_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">No orders yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

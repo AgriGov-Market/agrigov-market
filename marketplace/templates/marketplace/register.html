@@ -1,0 +1,23 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block title %}Register - AgriGov Market{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center">🌱 Join AgriGov Market</h2>
+        <p class="text-center">Create your account and start trading</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+        </form>
+        
+        <p class="text-center mt-4">
+            Already have an account? <a href="/login/">Login here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
