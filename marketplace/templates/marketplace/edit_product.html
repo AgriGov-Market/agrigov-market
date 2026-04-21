@@ -1,0 +1,11 @@
+{% extends 'marketplace/base.html' %}
+{% block content %}
+<h2>Edit Product</h2>
+<p>Update the approved category, picture, quantity, unit, or price for this listing.</p>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
+    <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline">Cancel</a>
+</form>
+{% endblock %}

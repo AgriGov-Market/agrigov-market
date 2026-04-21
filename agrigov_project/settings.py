@@ -2,6 +2,7 @@
 Django settings for agrigov_project project.
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -13,7 +14,9 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-this-for-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+default_hosts = ['127.0.0.1', 'localhost', 'testserver']
+env_hosts = os.getenv('DJANGO_ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [host.strip() for host in env_hosts.split(',') if host.strip()] or default_hosts
 
 # Application definition
 INSTALLED_APPS = [
@@ -23,7 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'marketplace',  # Our app
+    'marketplace',  # our custom app
 ]
 
 MIDDLEWARE = [
@@ -41,7 +44,7 @@ ROOT_URLCONF = 'agrigov_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],   # global templates folder (optional)
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,13 +90,18 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'     # for collectstatic (optional)
+
+# Media files (user uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Login/Logout URLs
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/login/'
-STATICFILES_DIRS = [BASE_DIR / 'marketplace' / 'static']
+# Login/login redirects
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'home'

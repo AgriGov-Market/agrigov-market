@@ -1,41 +1,44 @@
 {% extends 'marketplace/base.html' %}
-{% load static %}
-
-{% block title %}Official Prices - AgriGov Market{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="card">
-        <h2 class="text-center"><i class="fas fa-chart-line"></i> Official Market Prices</h2>
-        <p class="text-center">Reference prices set by the Ministry of Agriculture</p>
-        
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Official Price Range (DZD)</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in products %}
-                    <tr>
-                        <td>{{ product.category }}</td>
-                        <td>To be defined by ministry</td>
-                        <td><span class="badge">🟡 Pending</span></td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No categories defined yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <p class="text-center"><em>📢 Official prices will be updated weekly by the Ministry.</em></p>
-        <p class="text-center"><a href="/dashboard/">← Back to Dashboard</a></p>
-    </div>
-</div>
+<h2>Official Market Prices</h2>
+
+<h3>Ministry Product Categories</h3>
+<table>
+    <thead><tr><th>Category</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for category in categories %}
+        <tr><td>{{ category.name }}</td><td>{% if category.is_active %}Active{% else %}Inactive{% endif %}</td></tr>
+    {% empty %}
+        <tr><td colspan="2">No product categories set yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<table>
+    <thead><tr><th>Commodity</th><th>Price per kg (DA)</th><th>Effective Date</th></tr></thead>
+    <tbody>
+    {% for price in prices %}
+        <tr><td>{{ price.commodity }}</td><td>{{ price.price_per_kg }}</td><td>{{ price.effective_date }}</td></tr>
+    {% empty %}
+        <tr><td colspan="3">No prices set yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+    <h3>Add Product Category</h3>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_category">
+        {{ category_form.as_p }}
+        <button type="submit">Add Category</button>
+    </form>
+
+    <h3>Add New Price</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Price</button>
+    </form>
+{% endif %}
 {% endblock %}

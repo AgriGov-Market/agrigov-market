@@ -1,0 +1,21 @@
+{% extends 'marketplace/base.html' %}
+{% block content %}
+<h2>All Registered Users</h2>
+<table>
+    <thead>
+        <tr><th>ID</th><th>Username</th><th>Email</th><th>Type</th><th>Capacity (kg)</th></tr>
+    </thead>
+    <tbody>
+        {% for u in all_users %}
+        <tr>
+            <td>{{ u.id }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>{% if u.userprofile %}{{ u.userprofile.user_type }}{% else %}-{% endif %}</td>
+            <td>{% with t=u.transporterinfo %}{% if t %}{{ t.capacity_kg }}{% else %}-{% endif %}{% endwith %}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
+{% endblock %}

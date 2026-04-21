@@ -1,23 +1,40 @@
 {% extends 'marketplace/base.html' %}
-{% load static %}
-
-{% block title %}Register - AgriGov Market{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="form-container">
-        <h2 class="text-center">🌱 Join AgriGov Market</h2>
-        <p class="text-center">Create your account and start trading</p>
-        
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
-        </form>
-        
-        <p class="text-center mt-4">
-            Already have an account? <a href="/login/">Login here</a>
-        </p>
-    </div>
-</div>
+<h2>Register</h2>
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <div>
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+                <div class="errorlist">{{ field.errors }}</div>
+            {% endif %}
+            {% if field.help_text %}
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit">Register</button>
+</form>
+
+<script>
+    const userTypeField = document.getElementById('id_user_type');
+    const capacityDiv = document.getElementById('id_capacity_kg')?.closest('div');
+    const vehicleDiv = document.getElementById('id_vehicle_number')?.closest('div');
+
+    function toggleTransporterFields() {
+        if (userTypeField && userTypeField.value === 'transporter') {
+            if (capacityDiv) capacityDiv.style.display = 'block';
+            if (vehicleDiv) vehicleDiv.style.display = 'block';
+        } else {
+            if (capacityDiv) capacityDiv.style.display = 'none';
+            if (vehicleDiv) vehicleDiv.style.display = 'none';
+        }
+    }
+    if (userTypeField) {
+        userTypeField.addEventListener('change', toggleTransporterFields);
+        toggleTransporterFields();
+    }
+</script>
 {% endblock %}

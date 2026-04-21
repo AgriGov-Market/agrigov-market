@@ -1,72 +1,17 @@
 {% extends 'marketplace/base.html' %}
-{% load static %}
-
-{% block title %}Buyer Dashboard - AgriGov Market{% endblock %}
-
 {% block content %}
-<div class="dashboard-wrapper">
-    <div class="sidebar">
-        <h3>🛒 Buyer Panel</h3>
-        <a href="/dashboard/"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="/product-list/"><i class="fas fa-search"></i> Browse Products</a>
-        <a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-    
-    <div class="main-content">
-        <h2>Welcome, {{ user.username }}! 🛍️</h2>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">{{ orders|length }}</div>
-                <div class="stat-label">Your Orders</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ products|length }}</div>
-                <div class="stat-label">Available Products</div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3><i class="fas fa-search"></i> Available Products</h3>
-            <div class="product-grid">
-                {% for product in products %}
-                <div class="product-card">
-                    <div class="product-card-content">
-                        <h4>{{ product.name }}</h4>
-                        <p><i class="fas fa-tractor"></i> {{ product.farmer.username }}</p>
-                        <p><i class="fas fa-map-marker-alt"></i> {{ product.farm.location }}</p>
-                        <p><i class="fas fa-weight-hanging"></i> {{ product.quantity }} {{ product.unit }}</p>
-                        <p><i class="fas fa-tag"></i> {{ product.price_per_unit }} DZD/{{ product.unit }}</p>
-                        <a href="/place-order/{{ product.id }}/" class="btn btn-primary">Order Now</a>
-                    </div>
-                </div>
-                {% empty %}
-                <p>No products available.</p>
-                {% endfor %}
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3><i class="fas fa-history"></i> Your Orders</h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Product</th><th>Quantity</th><th>Total</th><th>Status</th><th>Delivery</th></tr></thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr>
-                            <td>{{ order.product.name }}</td>
-                            <td>{{ order.quantity }}</td>
-                            <td>{{ order.total_price }} DZD</td>
-                            <td>{{ order.get_status_display }}</td>
-                            <td>{% if order.delivery %}{{ order.delivery.get_status_display }}{% else %}Pending{% endif %}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="5">No orders yet.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+<h2>Buyer Dashboard</h2>
+<a href="{% url 'product_list' %}" class="btn">Browse Products</a>
+
+<h3>My Orders</h3>
+<table>
+    <thead><tr><th>Product</th><th>Quantity</th><th>Total Price</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for order in orders %}
+        <tr><td>{{ order.product.display_name }}</td><td>{{ order.quantity }}</td><td>DA {{ order.total_price }}</td><td>{{ order.status }}</td></tr>
+    {% empty %}
+        <tr><td colspan="4">No orders yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

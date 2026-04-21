@@ -1,33 +1,14 @@
 {% extends 'marketplace/base.html' %}
-{% load static %}
-
-{% block title %}Place Order - AgriGov Market{% endblock %}
-
 {% block content %}
-<div class="container">
-    <div class="form-container">
-        <h2 class="text-center"><i class="fas fa-shopping-cart"></i> Place Order</h2>
-        
-        <div class="card" style="background: #e8f5e9; margin-bottom: 1.5rem;">
-            <h4>{{ product.name }}</h4>
-            <p><strong>Price:</strong> {{ product.price_per_unit }} DZD/{{ product.unit }}</p>
-            <p><strong>Farmer:</strong> {{ product.farmer.username }}</p>
-            <p><strong>Farm Location:</strong> {{ product.farm.location }}</p>
-        </div>
-        
-        <form method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label><i class="fas fa-weight-hanging"></i> Quantity ({{ product.unit }})</label>
-                <input type="number" name="quantity" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-map-marker-alt"></i> Delivery Address</label>
-                <textarea name="delivery_address" rows="3" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Confirm Order</button>
-        </form>
-        <p class="text-center mt-2"><a href="/product-list/">← Back to Products</a></p>
-    </div>
-</div>
+<h2>Place Order for {{ product.display_name }}</h2>
+{% if product.image %}
+<img src="{{ product.image.url }}" alt="{{ product.display_name }}" class="product-detail-image">
+{% endif %}
+<p>Available: {{ product.quantity }} {{ product.unit }}</p>
+<p>Price: DA {{ product.price_per_unit }}/{{ product.unit }}</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Confirm Order</button>
+</form>
 {% endblock %}

@@ -1,77 +1,35 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AgriGov Market{% endblock %}</title>
-    {% load static %}
+    <title>AgriGov Market</title>
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    {% if user.is_authenticated %}
-    <!-- Navigation Bar for Logged-in Users -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="/" class="logo">🌾 AgriGov Market</a>
-            <div class="nav-links">
-                <a href="/dashboard/"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                {% if user.profile.role == 'farmer' %}
-                    <a href="/add-farm/"><i class="fas fa-tractor"></i> Add Farm</a>
-                    <a href="/add-product/"><i class="fas fa-box"></i> Add Product</a>
-                {% elif user.profile.role == 'buyer' %}
-                    <a href="/product-list/"><i class="fas fa-search"></i> Browse Products</a>
-                {% endif %}
-                <a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </div>
-        </div>
-    </nav>
-    {% else %}
-    <!-- Navigation Bar for Guests -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="/" class="logo">🌾 AgriGov Market</a>
-            <div class="nav-links">
-                <a href="/login/">Login</a>
-                <a href="/register/">Register</a>
-            </div>
-        </div>
-    </nav>
-    {% endif %}
-
-    <!-- Messages -->
-    <div class="messages">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
-                    {{ message }}
-                </div>
-            {% endfor %}
+    <nav>
+        <a href="{% url 'home' %}">Home</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'logout' %}">Logout ({{ user.username }})</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
         {% endif %}
+        <a href="{% url 'official_prices' %}">Official Prices</a>
+        <a href="{% url 'product_list' %}">Products</a>
+    </nav>
+    <div class="container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
     </div>
-
-    <!-- Main Content -->
-    {% block content %}
-    {% endblock %}
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p>🌾 AgriGov Market | Ministry of Agriculture - Algeria</p>
-        <p>© 2025 - Connecting Farmers, Buyers & Transporters</p>
-    </footer>
-
-    <script>
-        // Auto-hide messages after 5 seconds
-        setTimeout(function() {
-            const messages = document.querySelectorAll('.alert');
-            messages.forEach(function(message) {
-                message.style.opacity = '0';
-                setTimeout(function() {
-                    message.remove();
-                }, 300);
-            });
-        }, 5000);
-    </script>
 </body>
 </html>

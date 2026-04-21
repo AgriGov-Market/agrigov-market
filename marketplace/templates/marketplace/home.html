@@ -1,34 +1,47 @@
 {% extends 'marketplace/base.html' %}
-{% load static %}
-
-{% block title %}Home - AgriGov Market{% endblock %}
-
 {% block content %}
-<div class="hero">
-    <h1>🌾 Connect. Trade. Deliver.</h1>
-    <p>The national platform connecting farmers, buyers, and transporters in Algeria</p>
-    <div class="hero-buttons">
-        <a href="/register/" class="btn btn-primary">🚀 Get Started</a>
-        <a href="/login/" class="btn btn-outline">🔑 Login</a>
-    </div>
-</div>
-
-<div class="container">
-    <h2 class="text-center">Latest Products</h2>
-    <div class="product-grid">
-        {% for product in products %}
-        <div class="product-card">
-            <div class="product-card-content">
-                <h4>{{ product.name }}</h4>
-                <p><i class="fas fa-tractor"></i> {{ product.farm.name }}</p>
-                <p><i class="fas fa-weight-hanging"></i> {{ product.quantity }} {{ product.unit }}</p>
-                <p><i class="fas fa-tag"></i> {{ product.price_per_unit }} DZD/{{ product.unit }}</p>
-                <span class="badge">{{ product.get_quality_display }}</span>
-            </div>
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Digital agriculture marketplace</p>
+        <h1>Move crops from farm to buyer with less friction.</h1>
+        <p class="hero-lead">
+            AgriGov Market helps farmers list produce, buyers place orders, and transporters
+            coordinate delivery in one simple workflow.
+        </p>
+        <div class="hero-actions">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn">Open Dashboard</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn">Create Account</a>
+                <a href="{% url 'product_list' %}" class="btn btn-outline">Browse Produce</a>
+            {% endif %}
         </div>
-        {% empty %}
-        <p class="text-center">No products available yet.</p>
-        {% endfor %}
     </div>
-</div>
+    <div class="hero-panel">
+        <div class="hero-badge">Trusted flow</div>
+        <div class="hero-stat">
+            <span class="hero-stat-number">3 roles</span>
+            <span class="hero-stat-label">Farmers, buyers, transporters</span>
+        </div>
+        <div class="hero-stat">
+            <span class="hero-stat-number">1 platform</span>
+            <span class="hero-stat-label">Products, orders, prices, delivery</span>
+        </div>
+    </div>
+</section>
+
+<section class="feature-strip">
+    <article class="feature-card">
+        <h3>For Farmers</h3>
+        <p>Create farms, publish products, and track incoming orders from one dashboard.</p>
+    </article>
+    <article class="feature-card">
+        <h3>For Buyers</h3>
+        <p>Browse available produce, compare pricing, and place orders quickly.</p>
+    </article>
+    <article class="feature-card">
+        <h3>For Transporters</h3>
+        <p>Claim deliveries, update shipment status, and keep orders moving.</p>
+    </article>
+</section>
 {% endblock %}

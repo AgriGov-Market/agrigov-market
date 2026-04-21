@@ -1,120 +1,135 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
-# User Profile extending Django's User
-class Profile(models.Model):
-    ROLE_CHOICES = [
-        ('farmer', 'Farmer'),
-        ('buyer', 'Buyer'),
-        ('transporter', 'Transporter'),
-        ('admin', 'Ministry Admin'),
-    ]
-    
+USER_TYPE_CHOICES = (
+    ('farmer', 'Farmer'),
+    ('buyer', 'Buyer'),
+    ('transporter', 'Transporter'),
+    ('admin', 'Admin'),
+)
+
+
+class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='buyer')
+    user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES)
     phone = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
-    is_approved = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.role}"
 
-# Farm model (for farmers)
+    def __str__(self):
+        return f"{self.user.username} - {self.user_type}"
+
+
+class TransporterInfo(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    capacity_kg = models.DecimalField(max_digits=10, decimal_places=2)
+    vehicle_number = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.capacity_kg} kg"
+
+
 class Farm(models.Model):
-    farmer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='farms')
+    farmer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'userprofile__user_type': 'farmer'},
+    )
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
+    size_acres = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+
     def __str__(self):
         return self.name
 
-# Product model
+
+class ProductCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = 'product categories'
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
-    QUALITY_CHOICES = [
-        ('A', 'Premium'),
-        ('B', 'Standard'),
-        ('C', 'Economy'),
-    ]
-    
-    farmer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
-    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='products')
+    UNIT_CHOICES = (('kg', 'Kilogram'), ('ton', 'Ton'), ('piece', 'Piece'))
+    farmer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'userprofile__user_type': 'farmer'},
+    )
     name = models.CharField(max_length=100)
-    category = models.CharField(max_length=50)
+    category = models.ForeignKey(
+        ProductCategory,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='products',
+    )
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
-    unit = models.CharField(max_length=20, default='kg')
-    quality = models.CharField(max_length=1, choices=QUALITY_CHOICES, default='B')
+    unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default='kg')
     price_per_unit = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.FileField(
+        upload_to='products/',
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])],
+    )
     available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.name} - {self.farmer.username}"
 
-# Order model
+    @property
+    def display_name(self):
+        return self.category.name if self.category else self.name
+
+    def __str__(self):
+        return f"{self.display_name} by {self.farmer.username}"
+
+
 class Order(models.Model):
-    STATUS_CHOICES = [
+    STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('confirmed', 'Confirmed'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
-    ]
-    
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders_as_buyer')
-    farmer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders_as_farmer')
+    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     order_date = models.DateTimeField(auto_now_add=True)
     delivery_address = models.TextField()
-    
-    def __str__(self):
-        return f"Order #{self.id} - {self.buyer.username}"
 
-# Delivery model (for transporters)
+    def __str__(self):
+        return f"Order #{self.id} - {self.product.display_name}"
+
+
 class Delivery(models.Model):
-    STATUS_CHOICES = [
-        ('assigned', 'Assigned'),
-        ('picked_up', 'Picked Up'),
-        ('in_transit', 'In Transit'),
-        ('delivered', 'Delivered'),
-        ('failed', 'Failed'),
-    ]
-    
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='delivery')
-    transporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='deliveries', null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='assigned')
-    pickup_location = models.CharField(max_length=200)
-    dropoff_location = models.CharField(max_length=200)
-    estimated_days = models.IntegerField(default=3)
-    started_at = models.DateTimeField(null=True, blank=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    transporter = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'userprofile__user_type': 'transporter'},
+    )
+    estimated_delivery_date = models.DateField(null=True, blank=True)
+    actual_delivery_date = models.DateField(null=True, blank=True)
+    delivery_status = models.CharField(max_length=20, default='pending')
+
     def __str__(self):
         return f"Delivery for Order #{self.order.id}"
 
-# Transporter profile extension
-class TransporterInfo(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='transporter_info')
-    vehicle_type = models.CharField(max_length=50)
-    capacity_kg = models.DecimalField(max_digits=10, decimal_places=2)
-    service_areas = models.TextField()
-    is_available = models.BooleanField(default=True)
-    
+
+class OfficialPrice(models.Model):
+    commodity = models.CharField(max_length=100)
+    price_per_kg = models.DecimalField(max_digits=10, decimal_places=2)
+    effective_date = models.DateField(auto_now_add=True)
+
     def __str__(self):
-        return f"{self.user.username} - {self.vehicle_type}"
-
-# Auto-create Profile when User is created
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+        return f"{self.commodity}: DA {self.price_per_kg}/kg"

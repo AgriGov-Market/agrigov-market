@@ -1,72 +1,32 @@
 {% extends 'marketplace/base.html' %}
-{% load static %}
-
-{% block title %}Transporter Dashboard - AgriGov Market{% endblock %}
-
 {% block content %}
-<div class="dashboard-wrapper">
-    <div class="sidebar">
-        <h3>🚚 Transporter Panel</h3>
-        <a href="/dashboard/"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-    
-    <div class="main-content">
-        <h2>Welcome, {{ user.username }}! 🚛</h2>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">{{ available_deliveries|length }}</div>
-                <div class="stat-label">Available Deliveries</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">{{ deliveries|length }}</div>
-                <div class="stat-label">Your Deliveries</div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3><i class="fas fa-clock"></i> Available Deliveries</h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Order ID</th><th>Pickup</th><th>Dropoff</th><th>Action</th></tr></thead>
-                    <tbody>
-                        {% for delivery in available_deliveries %}
-                        <tr>
-                            <td>#{{ delivery.order.id }}</td>
-                            <td>{{ delivery.pickup_location }}</td>
-                            <td>{{ delivery.dropoff_location }}</td>
-                            <td><a href="/update-delivery/{{ delivery.id }}/" class="btn btn-primary">Accept</a></td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4">No available deliveries.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h3><i class="fas fa-truck"></i> Your Active Deliveries</h3>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Order ID</th><th>Pickup</th><th>Dropoff</th><th>Status</th><th>Update</th></tr></thead>
-                    <tbody>
-                        {% for delivery in deliveries %}
-                        <tr>
-                            <td>#{{ delivery.order.id }}</td>
-                            <td>{{ delivery.pickup_location }}</td>
-                            <td>{{ delivery.dropoff_location }}</td>
-                            <td>{{ delivery.get_status_display }}</td>
-                            <td><a href="/update-delivery/{{ delivery.id }}/" class="btn btn-primary">Update</a></td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="5">No active deliveries.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+<h2>Transporter Dashboard</h2>
+{% if transporter_info %}
+<p>Your vehicle capacity: {{ transporter_info.capacity_kg }} kg</p>
+{% endif %}
+
+<h3>Available and Assigned Deliveries</h3>
+<table>
+    <thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Assigned To</th><th>Delivery Status</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for delivery in deliveries %}
+        <tr>
+            <td>{{ delivery.order.id }}</td>
+            <td>{{ delivery.order.product.name }}</td>
+            <td>{{ delivery.order.buyer.username }}</td>
+            <td>{{ delivery.transporter.username|default:"Unassigned" }}</td>
+            <td>{{ delivery.delivery_status }}</td>
+            <td>
+                {% if delivery.transporter_id %}
+                    <a href="{% url 'update_delivery' delivery.id %}" class="btn">Update</a>
+                {% else %}
+                    <a href="{% url 'update_delivery' delivery.id %}" class="btn">Claim Delivery</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="6">No deliveries available right now.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
