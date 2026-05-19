@@ -1,0 +1,98 @@
+{% extends 'marketplace/base.html' %}
+
+{% block page_title %}Notifications{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notifications-page {
+        background: url('/media/products/5789403159968026352_121.jpg') center/cover no-repeat fixed;
+        padding: 40px;
+    }
+    .notifications-page .page-card,
+    .notifications-page .card-header {
+        background: rgba(255, 255, 255, 0.96) !important;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        color: #000000;
+    }
+    .notifications-page .card-body,
+    .notifications-page .list-group,
+    .notifications-page .list-group-item,
+    .notifications-page .table {
+        background: rgba(255, 255, 255, 0.88) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        color: #000000;
+    }
+    .notifications-page .list-group-item.notification-unread {
+        background: rgba(255, 255, 255, 0.90) !important;
+    }
+    .notifications-page .card-header,
+    .notifications-page .card-body {
+        border: none !important;
+    }
+    .notifications-page .btn-outline-primary,
+    .notifications-page .btn-outline-secondary {
+        border-color: rgba(0, 0, 0, 0.15);
+        color: #000000;
+    }
+    .notifications-page .btn-outline-primary {
+        background: rgba(255, 255, 255, 0.9);
+    }
+    .notifications-page .btn-outline-secondary {
+        background: rgba(34, 85, 34, 0.95);
+        border-color: rgba(34, 85, 34, 1);
+        color: #ffffff;
+    }
+    .notifications-page .btn-outline-primary:hover,
+    .notifications-page .btn-outline-secondary:hover {
+        background: rgba(34, 85, 34, 1);
+        color: #ffffff;
+    }
+    .notifications-page .text-muted {
+        color: rgba(0, 0, 0, 0.6) !important;
+    }
+    .notifications-page h5,
+    .notifications-page strong {
+        color: #000000;
+    }
+    .notifications-page .btn-close {
+        filter: none;
+    }
+    @media (max-width: 768px) {
+        .notifications-page .page-content {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notifications-page">
+    <div class="page-card card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <div>
+                <h5 class="mb-1">Notifications</h5>
+                <p class="mb-0 text-muted">Recent activity and updates for your account.</p>
+            </div>
+        </div>
+        <div class="card-body">
+            {% for notification in notifications %}
+            <div class="list-group mb-3">
+                <div class="list-group-item{% if notification.unread %} notification-unread{% endif %}" data-id="{{ notification.id }}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ notification.title }}</strong>
+                            <div class="small text-muted">{{ notification.message }}</div>
+                            <div class="small text-muted mt-1">{{ notification.time }}</div>
+                        </div>
+                        <div class="d-flex gap-2 align-items-start">
+                            <button type="button" class="btn btn-sm btn-outline-secondary notification-close" data-id="{{ notification.id }}">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

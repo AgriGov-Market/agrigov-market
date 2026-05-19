@@ -1,0 +1,41 @@
+{% extends 'marketplace/base.html' %}
+{% block page_title %}Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-receipt text-success me-2"></i>Order #{{ order.id }}</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6"><strong>Product:</strong> {{ order.product.display_name }}</div>
+                    <div class="col-md-6"><strong>Order Total:</strong> DA {{ order.total_price }}</div>
+                    <div class="col-md-6"><strong>Buyer:</strong> <a href="{% url 'public_profile' order.buyer.id %}">{{ order.buyer.username }}</a></div>
+                    <div class="col-md-6"><strong>Farmer:</strong> <a href="{% url 'public_profile' order.product.farmer.id %}">{{ order.product.farmer.username }}</a></div>
+                    <div class="col-md-6"><strong>Transporter:</strong>
+                        {% if delivery.transporter %}
+                            <a href="{% url 'public_profile' delivery.transporter.id %}">{{ delivery.transporter.username }}</a>
+                        {% else %}
+                            <span class="text-muted">Not assigned</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6"><strong>Delivery Status:</strong> {{ delivery.delivery_status|title }}</div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <label class="form-label">Delivery Fee (DA)</label>
+                    {{ form.delivery_fee }}
+                    {% if form.delivery_fee.errors %}<div class="text-danger small">{{ form.delivery_fee.errors }}</div>{% endif %}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save Fee</button>
+                        <a href="{% url 'admin_order_list' %}" class="btn btn-outline-secondary">Back to Orders</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

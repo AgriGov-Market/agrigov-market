@@ -1,26 +1,194 @@
 {% extends 'marketplace/base.html' %}
+{% block page_title %}Market Products{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-page-background {
+        position: relative;
+        min-height: 100vh;
+        background-image: url('/media/products/5789403159968026352_121.jpg');
+        /* show full image without heavy cropping */
+        background-size: contain;
+        background-position: center top;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        padding-top: 90px;
+        padding-bottom: 90px;
+        background-color: #fbfbfb;
+    }
+    .product-page-background::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        /* lighter white overlay to brighten image */
+        background: rgba(255,255,255,0.08);
+        z-index: 0;
+    }
+    .product-page-background .container,
+    .product-page-background .card,
+    .product-page-background .product-card {
+        position: relative;
+        z-index: 1;
+    }
+    .product-page-background .card,
+    .product-page-background .product-card {
+        background: rgba(255,255,255,0.68);
+        border-color: rgba(255,255,255,0.22);
+        backdrop-filter: blur(18px);
+    }
+    .product-page-background .card-body {
+        background: transparent;
+    }
+    .product-page-background .product-image-wrapper {
+        background: rgba(255,255,255,0.15);
+    }
+    .product-page-background .btn,
+    .product-page-background .form-control,
+    .product-page-background .form-select,
+    .product-page-background .input-group-text {
+        background: rgba(255,255,255,0.85);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Available Products</h2>
-<div class="product-grid">
-    {% for product in products %}
-        <div class="product-card">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.display_name }}" class="product-card-image">
-            {% else %}
-                <div class="product-card-image product-card-image-placeholder">No image</div>
-            {% endif %}
-            <h4>{{ product.display_name }}</h4>
-            <p>Farmer: {{ product.farmer.username }}</p>
-            <p>Quantity: {{ product.quantity }} {{ product.unit }}</p>
-            <p>Price: DA {{ product.price_per_unit }}/{{ product.unit }}</p>
-            {% if user.is_authenticated and user.userprofile.user_type == 'buyer' %}
-                <a href="{% url 'place_order' product.id %}" class="btn">Order Now</a>
-            {% else %}
-                <p><em>Login as buyer to order</em></p>
-            {% endif %}
+<div class="product-page-background">
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="mb-5">
+        <h1 class="display-5 fw-bold mb-2" style="color: #111827;">Marketplace</h1>
+        <p class="lead text-muted">Discover fresh products directly from farmers</p>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="card border-0 rounded-3 shadow-sm mb-5">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3">
+                <div class="col-md-5">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text border-0" style="background-color: #f3f4f6;"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-0" placeholder="Search products..." value="{{ request.GET.search|default:'' }}" style="background-color: #f3f4f6;">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select form-select-lg border-0" style="background-color: #f3f4f6;">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
+                                {{ cat.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="sort" class="form-select form-select-lg border-0" style="background-color: #f3f4f6;">
+                        <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low ↑</option>
+                        <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High ↓</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-2">
+                        <i class="fas fa-filter me-2"></i> Filter
+                    </button>
+                </div>
+            </form>
         </div>
-    {% empty %}
-        <p>No products available.</p>
-    {% endfor %}
+    </div>
+
+    <!-- Results Count -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0 fw-bold">{{ products|length }} Product{{ products|length|pluralize }} Found</h5>
+    </div>
+
+    <!-- Product Grid -->
+    {% if products %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 border-0 rounded-3 shadow-sm overflow-hidden product-card" style="transition: all .3s ease;">
+                <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
+                    <div class="position-relative product-image-wrapper" style="overflow: hidden; aspect-ratio: 1; background: #f3f4f6;">
+                        {% if product.image_url %}
+                            <img src="{{ product.image_url }}" alt="{{ product.display_name }}" class="w-100 h-100" style="object-fit: cover; transition: transform .3s ease;">
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
+                                <i class="fas fa-box" style="font-size: 3rem; color: #cbd5e1;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="position-absolute top-0 end-0 p-2">
+                            {% if product.available %}
+                                <span class="badge bg-success-subtle text-success-emphasis">In Stock</span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger-emphasis">Out of Stock</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-body p-3">
+                        <span class="badge bg-info-subtle text-info-emphasis mb-2 d-block">{{ product.category.name|default:"Uncategorized" }}</span>
+                        <h5 class="card-title fw-bold mb-2 text-dark" style="font-size: 1.1rem; line-height: 1.4;">{{ product.display_name }}</h5>
+                        <p class="card-text text-muted mb-3" style="font-size: 0.95rem; line-height: 1.5;">{{ product.description|default:"No description available."|truncatechars:80 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3 py-2 border-top border-bottom">
+                            <div>
+                                <small class="text-muted d-block">Farmer</small>
+                                <strong class="text-dark">{{ product.farmer.username }}</strong>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Available</small>
+                                <strong class="text-dark">{{ product.quantity }} {{ product.unit }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 mb-0 fw-bold text-success">DA {{ product.price_per_unit }}</span>
+                            <small class="text-muted">/{{ product.unit }}</small>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="card-footer bg-white border-top p-3">
+                    {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+                        <form method="post" action="{% url 'admin_delete_product' product.id %}" onsubmit="return confirm('Delete this product? This action cannot be undone.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger w-100 rounded-2">
+                                <i class="fas fa-trash me-2"></i>Delete Product
+                            </button>
+                        </form>
+                    {% elif user.is_authenticated and user.userprofile.user_type == 'buyer' and product.available %}
+                        <a href="{% url 'place_order' product.id %}" class="btn btn-success w-100 rounded-2">
+                            <i class="fas fa-shopping-cart me-2"></i>Order Now
+                        </a>
+                    {% elif not user.is_authenticated %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-success w-100 rounded-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Order
+                        </a>
+                    {% else %}
+                        <button class="btn btn-outline-secondary w-100 rounded-2" disabled>
+                            Buyer account required
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-search" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem; display: block;"></i>
+        <h4 class="fw-bold mb-2">No Products Found</h4>
+        <p class="text-muted mb-4">Try adjusting your search or filter criteria</p>
+        <a href="{% url 'product_list' %}" class="btn btn-success btn-lg rounded-2">
+            <i class="fas fa-redo me-2"></i>Clear Filters
+        </a>
+    </div>
+    {% endif %}
 </div>
+</div>
+<style>
+    .product-card { transition: all .3s ease; }
+    .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important; }
+    .product-image-wrapper img:hover { transform: scale(1.05); }
+</style>
 {% endblock %}

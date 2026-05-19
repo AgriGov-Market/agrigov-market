@@ -1,40 +1,90 @@
 {% extends 'marketplace/base.html' %}
-{% block content %}
-<h2>Register</h2>
-<form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-        <div>
-            {{ field.label_tag }}
-            {{ field }}
-            {% if field.errors %}
-                <div class="errorlist">{{ field.errors }}</div>
-            {% endif %}
-            {% if field.help_text %}
-                <small>{{ field.help_text }}</small>
-            {% endif %}
+{% block title %}Register - AgriGov Market{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-side brand-side">
+            <img src="/media/products/logow.png" alt="AgriGov Market" style="width:64px; height:auto; margin-bottom: 20px; display:block;">
+            <h2>AgriGov Market</h2>
+            <p>Join the national agricultural platform</p>
+            <div style="margin-top: 40px;">
+                <div class="text-start">
+                    <p class="mb-2"><i class="fas fa-check-circle me-2"></i>List your products</p>
+                    <p class="mb-2"><i class="fas fa-check-circle me-2"></i>Buy directly from farmers</p>
+                    <p class="mb-2"><i class="fas fa-check-circle me-2"></i>Manage deliveries</p>
+                    <p><i class="fas fa-check-circle me-2"></i>Official pricing data</p>
+                </div>
+            </div>
         </div>
-    {% endfor %}
-    <button type="submit">Register</button>
-</form>
+        <div class="auth-side">
+            <h3>Create Account</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required placeholder="Choose a username">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password1" class="form-control" required placeholder="Create a password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="password2" class="form-control" required placeholder="Confirm your password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Account Type</label>
+                    <select name="user_type" class="form-select" id="id_user_type" required>
+                        <option value="">Select account type</option>
+                        <option value="farmer">Farmer</option>
+                        <option value="buyer">Buyer</option>
+                        <option value="transporter">Transporter</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="transporter-fields" style="display: none;">
+                    <label class="form-label">Vehicle Number</label>
+                    <input type="text" name="vehicle_number" class="form-control" placeholder="e.g., 01-ABC-001">
+                </div>
+                <div class="mb-3" id="capacity-field" style="display: none;">
+                    <label class="form-label">Capacity (kg)</label>
+                    <input type="number" name="capacity_kg" class="form-control" placeholder="Maximum load capacity">
+                </div>
+                <button type="submit" class="btn btn-success w-100 py-2" style="background: var(--primary-color);">
+                    <i class="fas fa-user-plus me-2"></i>Register
+                </button>
+            </form>
+            <div class="text-center mt-4">
+                <p class="text-muted">Already have an account? <a href="{% url 'login' %}" style="color: var(--primary-color);">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    const userTypeField = document.getElementById('id_user_type');
-    const capacityDiv = document.getElementById('id_capacity_kg')?.closest('div');
-    const vehicleDiv = document.getElementById('id_vehicle_number')?.closest('div');
-
-    function toggleTransporterFields() {
-        if (userTypeField && userTypeField.value === 'transporter') {
-            if (capacityDiv) capacityDiv.style.display = 'block';
-            if (vehicleDiv) vehicleDiv.style.display = 'block';
+document.addEventListener('DOMContentLoaded', function() {
+    const userTypeSelect = document.getElementById('id_user_type');
+    const transporterFields = document.getElementById('transporter-fields');
+    const capacityField = document.getElementById('capacity-field');
+    
+    function toggleFields() {
+        if (userTypeSelect && userTypeSelect.value === 'transporter') {
+            if (transporterFields) transporterFields.style.display = 'block';
+            if (capacityField) capacityField.style.display = 'block';
         } else {
-            if (capacityDiv) capacityDiv.style.display = 'none';
-            if (vehicleDiv) vehicleDiv.style.display = 'none';
+            if (transporterFields) transporterFields.style.display = 'none';
+            if (capacityField) capacityField.style.display = 'none';
         }
     }
-    if (userTypeField) {
-        userTypeField.addEventListener('change', toggleTransporterFields);
-        toggleTransporterFields();
+    
+    if (userTypeSelect) {
+        userTypeSelect.addEventListener('change', toggleFields);
+        toggleFields();
     }
+});
 </script>
 {% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'marketplace/base.html' %}
+{% block page_title %}Edit Category{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-background {
+        position: relative;
+        min-height: 100vh;
+        background-image: url('/media/products/connor-gan-l2LhqIQMo04-unsplash.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        padding: 48px 20px;
+    }
+    .page-background .card {
+        background: rgba(255,255,255,0.9);
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-background">
+<div class="row mb-4">
+    <div class="col-12">
+        <h4><i class="fas fa-edit text-success me-2"></i>Edit Category</h4>
+        <p class="text-muted">Update the category name, parent relationship, price range, or active status.</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-body">
+        <h5 class="mb-4">{{ category.name }}</h5>
+        <form method="post">
+            {% csrf_token %}
+            {% if category_form.non_field_errors %}
+                <div class="alert alert-danger">{{ category_form.non_field_errors }}</div>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label">Category Name</label>
+                {{ category_form.name }}
+                {% if category_form.name.errors %}<div class="text-danger small">{{ category_form.name.errors }}</div>{% endif %}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Parent Category</label>
+                {{ category_form.parent }}
+                {% if category_form.parent.errors %}<div class="text-danger small">{{ category_form.parent.errors }}</div>{% endif %}
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Minimum Price (DA/kg)</label>
+                    {{ category_form.min_price }}
+                    {% if category_form.min_price.errors %}<div class="text-danger small">{{ category_form.min_price.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Maximum Price (DA/kg)</label>
+                    {{ category_form.max_price }}
+                    {% if category_form.max_price.errors %}<div class="text-danger small">{{ category_form.max_price.errors }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-check mb-3">
+                {{ category_form.is_active }}
+                <label class="form-check-label">Active</label>
+                {% if category_form.is_active.errors %}<div class="text-danger small">{{ category_form.is_active.errors }}</div>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-success me-2">
+                <i class="fas fa-save me-2"></i>Save Changes
+            </button>
+            <a href="{% url 'categories' %}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

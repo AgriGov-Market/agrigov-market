@@ -1,4 +1,7 @@
 venv/ 
+.venv2/
+agrigov_market/
+lastone/
 __pycache__/ 
 *.pyc 
 db.sqlite3 

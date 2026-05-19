@@ -1,490 +1,3462 @@
-/* static/css/style.css */
-
 /* ===== RESET & BASE ===== */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background:
-        radial-gradient(circle at top left, rgba(255, 200, 87, 0.28), transparent 28%),
-        linear-gradient(180deg, #f7f3e8 0%, #eef2e6 48%, #e4ecdf 100%);
-    color: #1e3a2f;
-    line-height: 1.6;
-    min-height: 100vh;
+:root {
+    --sidebar-width: 210px;
+    --sidebar-bg: #0d2818;
+    --sidebar-active: #1a3d25;
+    --sidebar-hover: rgba(255,255,255,0.06);
+    --primary: #1e6b3a;
+    --primary-light: #28a55a;
+    --accent: #22c55e;
+    --surface: #ffffff;
+    --surface-2: #f8faf8;
+    --border: #e8ede8;
+    --text-primary: #0d1f14;
+    --text-secondary: #6b7f72;
+    --text-muted: #9db3a3;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --success: #22c55e;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
 }
 
-/* ===== NAVIGATION BAR ===== */
-nav {
-    background: linear-gradient(135deg, #1e5631 0%, #2c7a42 100%);
-    padding: 1rem 2rem;
+body {
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+    font-size: 14px;
+    overflow-x: hidden;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    color: white;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    z-index: 200;
+    overflow: hidden;
+}
+
+.sidebar-logo {
+    padding: 20px 18px 16px;
+    display: flex;
     align-items: center;
-    gap: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.sidebar-logo .logo-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2d7a46, #1e5631);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.sidebar-logo .logo-text {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.sidebar-logo .logo-sub {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 12px 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-radius: 0;
+    position: relative;
+}
+
+.sidebar-nav a:hover {
+    color: white;
+    background: var(--sidebar-hover);
+}
+
+.sidebar-nav a.active {
+    color: white;
+    background: var(--primary);
+    border-radius: var(--radius-sm);
+    margin: 2px 10px;
+    padding: 10px 12px;
+}
+
+.sidebar-nav a i {
+    width: 18px;
+    font-size: 1rem;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.sidebar-nav a.active i { opacity: 1; }
+
+.sidebar-nav .nav-section {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.3);
+    padding: 14px 18px 4px;
+}
+
+/* Online status card at bottom of sidebar */
+.sidebar-status {
+    margin: 12px;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-status .status-truck {
+    font-size: 2rem;
+    margin-bottom: 6px;
+}
+
+.sidebar-status p {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 2px;
+}
+
+.sidebar-status small {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.online-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggle-switch {
+    width: 36px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== TOP NAVBAR ===== */
+.top-navbar {
+    background: white;
+    padding: 0 28px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: var(--shadow-sm);
 }
 
-nav a {
-    color: #f9f7f0;
+.top-navbar .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.top-navbar .hamburger {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-right: 14px;
+}
+
+.top-navbar .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.notif-btn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
     text-decoration: none;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 30px;
-    transition: all 0.3s ease;
-    font-size: 0.95rem;
+    transition: all 0.2s;
 }
 
-nav a:hover {
-    background: #ffc857;
-    color: #1e3a2f;
+.notif-btn:hover { background: var(--border); color: var(--primary); }
+
+.notif-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 18px;
+    height: 18px;
+    background: var(--danger);
+    border-radius: 50%;
+    font-size: 0.65rem;
+    color: white;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    transition: background 0.2s;
+}
+
+.user-profile:hover { background: var(--surface-2); }
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2d7a46, #1e5631);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+    overflow: hidden;
+}
+
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-info .user-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.user-info .user-role {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* ===== PAGE CONTENT ===== */
+.page-content {
+    padding: 24px 28px;
+    flex: 1;
+}
+
+/* ===== STAT CARDS ===== */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
 }
 
-/* ===== CONTAINER ===== */
-.container {
-    max-width: 1300px;
-    margin: 2rem auto;
-    padding: 0 2rem;
-}
-
-/* ===== HOME PAGE ===== */
-.hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
-    gap: 2rem;
-    align-items: stretch;
-    padding: 2.5rem;
-    border-radius: 32px;
-    background:
-        linear-gradient(135deg, rgba(30, 86, 49, 0.95), rgba(44, 122, 66, 0.9)),
-        linear-gradient(45deg, #1e5631, #2c7a42);
-    color: #f6f2e8;
-    box-shadow: 0 20px 50px rgba(30, 86, 49, 0.18);
-    overflow: hidden;
-    position: relative;
-}
-
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: auto -60px -60px auto;
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: rgba(255, 200, 87, 0.18);
-}
-
-.hero-copy,
-.hero-panel {
-    position: relative;
-    z-index: 1;
-}
-
-.eyebrow {
-    display: inline-block;
-    margin-bottom: 1rem;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.12);
-    color: #ffe2a2;
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-.hero h1 {
-    color: #fffdf7;
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    line-height: 1.05;
-    border-left: none;
-    padding-left: 0;
-    margin-bottom: 1rem;
-}
-
-.hero-lead {
-    max-width: 42rem;
-    font-size: 1.08rem;
-    color: rgba(255, 250, 240, 0.9);
-}
-
-.hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.75rem;
-}
-
-.hero-actions .btn {
-    min-width: 170px;
-}
-
-.hero-actions .btn-outline {
-    border-color: rgba(255, 255, 255, 0.55);
-    color: #fffdf7;
-}
-
-.hero-actions .btn-outline:hover {
-    background: #fff4cf;
-    border-color: #fff4cf;
-    color: #1e3a2f;
-}
-
-.hero-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    border-radius: 24px;
-    background: rgba(247, 243, 232, 0.12);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.hero-badge {
-    font-weight: 700;
-    color: #ffe2a2;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+.stat-card .stat-text .label {
     font-size: 0.8rem;
-}
-
-.hero-stat {
-    display: flex;
-    flex-direction: column;
-    padding: 1rem 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.hero-stat:first-of-type {
-    border-top: none;
-}
-
-.hero-stat-number {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #fffdf7;
-}
-
-.hero-stat-label {
-    color: rgba(255, 250, 240, 0.82);
-}
-
-.feature-strip {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.25rem;
-    margin-top: 1.75rem;
-}
-
-.feature-card {
-    padding: 1.5rem;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(44, 122, 66, 0.08);
-    box-shadow: 0 12px 24px rgba(30, 86, 49, 0.07);
-}
-
-.feature-card h3 {
-    margin-bottom: 0.5rem;
-}
-
-/* ===== MESSAGES (Django flash) ===== */
-.messages {
-    list-style: none;
-    margin-bottom: 1.5rem;
-}
-
-.messages li {
-    background: #d9f0da;
-    border-left: 6px solid #2c7a42;
-    padding: 0.8rem 1.2rem;
-    margin: 0.5rem 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    color: var(--text-secondary);
+    margin-bottom: 4px;
     font-weight: 500;
 }
 
-/* ===== TYPOGRAPHY ===== */
-h1, h2, h3, h4 {
-    color: #1e5631;
-    margin-bottom: 1rem;
+.stat-card .stat-text .value {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.stat-card .stat-text .value small {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.stat-card .stat-text .view-link {
+    font-size: 0.78rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 6px;
+}
+
+.stat-card .stat-text .view-link:hover { text-decoration: underline; }
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.stat-icon.orange { background: #fff3e0; color: #f97316; }
+.stat-icon.blue   { background: #eff6ff; color: #3b82f6; }
+.stat-icon.green  { background: #f0fdf4; color: #22c55e; }
+.stat-icon.purple { background: #faf5ff; color: #a855f7; }
+
+/* ===== DASHBOARD GRID ===== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 20px;
+}
+
+.left-col, .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ===== CARD SHELL ===== */
+.card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-header h5 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.card-header .view-all {
+    font-size: 0.78rem;
+    color: var(--primary);
+    text-decoration: none;
     font-weight: 600;
 }
 
-h1 { font-size: 2.2rem; border-left: 6px solid #ffc857; padding-left: 1rem; }
-h2 { font-size: 1.8rem; border-bottom: 2px solid #cfe3cf; padding-bottom: 0.3rem; margin-top: 0.5rem; }
+.card-header .view-all:hover { text-decoration: underline; }
 
-/* ===== BUTTONS ===== */
-button, .btn, input[type="submit"], a.btn {
-    background: #2c7a42;
+/* ===== TABLE ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead th {
+    background: var(--surface-2);
+    padding: 10px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.data-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f3f5f3;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+.data-table tbody tr:hover td { background: #fafcfa; }
+
+.farmer-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.farmer-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.farmer-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.location-cell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.83rem;
+}
+
+.location-cell .loc-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.loc-pickup { background: #22c55e; }
+.loc-delivery { background: #ef4444; }
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.product-cell .product-emoji { font-size: 1rem; }
+
+.price-cell {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Action buttons */
+.action-cell { display: flex; gap: 4px; align-items: center; }
+
+.btn-accept {
+    padding: 5px 12px;
+    background: var(--primary);
     color: white;
     border: none;
-    padding: 0.6rem 1.5rem;
-    font-size: 0.95rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
     font-weight: 600;
-    border-radius: 40px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-block;
-    text-decoration: none;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background 0.2s;
 }
 
-button:hover, .btn:hover, input[type="submit"]:hover {
-    background: #ffb347;
-    color: #1e3a2f;
-    transform: scale(1.02);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
+.btn-accept:hover { background: #155228; }
 
-/* secondary / outline button */
-.btn-outline {
-    background: transparent;
-    border: 2px solid #2c7a42;
-    color: #2c7a42;
-}
-
-.btn-outline:hover {
-    background: #2c7a42;
+.btn-reject {
+    padding: 5px 12px;
+    background: var(--danger);
     color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-reject:hover { background: #c53030; }
+
+/* ===== ACTIVE DELIVERIES ===== */
+.delivery-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: background 0.15s;
+}
+
+.delivery-item:last-child { border-bottom: none; }
+.delivery-item:hover { background: #fafcfa; }
+
+.delivery-item .delivery-id {
+    display: inline-block;
+    background: #eff6ff;
+    color: var(--info);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    font-family: 'DM Mono', monospace;
+}
+
+.delivery-item .delivery-name {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+}
+
+.delivery-item .delivery-route {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.delivery-item .delivery-route i { font-size: 0.7rem; }
+
+.delivery-item .delivery-right {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.delivery-item .eta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.status-in-progress { background: #dcfce7; color: #16a34a; }
+.status-on-way { background: #dbeafe; color: #2563eb; }
+.status-pending { background: #fef3c7; color: #d97706; }
+
+/* map icon button */
+.map-pin-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f0fdf4;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 1px solid #d1fae5;
+    margin-left: 6px;
+}
+
+/* ===== ROUTE MAP ===== */
+#route-map {
+    height: 220px;
+    border-radius: 0;
+    width: 100%;
+}
+
+.map-legend {
+    padding: 10px 20px;
+    display: flex;
+    gap: 20px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+}
+
+.map-legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ===== EARNINGS OVERVIEW ===== */
+.earnings-rows { padding: 14px 20px; }
+
+.earnings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.earnings-row:last-child { border-bottom: none; }
+
+.earnings-row .er-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.earnings-row .er-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.er-icon.green { background: #f0fdf4; color: #22c55e; }
+.er-icon.blue  { background: #eff6ff; color: #3b82f6; }
+.er-icon.purple{ background: #faf5ff; color: #a855f7; }
+
+.earnings-row .er-label {
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.earnings-row .er-amount {
+    font-size: 0.93rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.earnings-chart {
+    padding: 0 20px 16px;
+    height: 120px;
+    position: relative;
+}
+
+.earnings-chart canvas { width: 100% !important; height: 100% !important; }
+
+.card-header .period-select {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: white;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ===== RECENT ACTIVITY ===== */
+.activity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+.activity-item {
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.activity-item:nth-child(odd) { border-right: 1px solid var(--border); }
+
+.activity-item:last-child, .activity-item:nth-last-child(2):nth-child(odd) {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.activity-icon.success { background: #dcfce7; color: #16a34a; }
+.activity-icon.info    { background: #dbeafe; color: #2563eb; }
+.activity-icon.warning { background: #fef3c7; color: #d97706; }
+
+.activity-text p {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.activity-text small {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* ===== RATINGS ===== */
+.ratings-body { padding: 16px 20px; }
+
+.rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.rating-big {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+.rating-stars i { color: var(--warning); font-size: 0.9rem; }
+
+.rating-count { font-size: 0.78rem; color: var(--text-secondary); }
+
+.rating-bars { flex: 1; }
+
+.rating-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.rating-bar-row .star-label {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.rating-bar-row .star-label i { font-size: 0.65rem; color: var(--warning); }
+
+.rb-track {
+    flex: 1;
+    height: 7px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rb-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.rb-fill.dominant { background: var(--primary); }
+
+.rating-bar-row .rb-count {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    width: 20px;
+    flex-shrink: 0;
+}
+
+/* ===== MESSAGES ===== */
+.messages {
+    list-style: none;
+    margin-bottom: 16px;
+}
+
+.messages li {
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-left: 4px solid;
+}
+
+.messages .success { background: #dcfce7; color: #166534; border-color: #22c55e; }
+.messages .error   { background: #fef2f2; color: #991b1b; border-color: #ef4444; }
+.messages .warning { background: #fefce8; color: #854d0e; border-color: #eab308; }
+.messages .info    { background: #eff6ff; color: #1e40af; border-color: #3b82f6; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.4; }
+.empty-state h6 { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 4px; }
+.empty-state p  { font-size: 0.8rem; }
+
+/* ===== AUTH PAGES ===== */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-image: url('/media/products/glenn-carstens-peters-2E_dT65fyxo-unsplash.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.auth-card {
+    background: rgba(255,255,255,0.70);
+    border: 1px solid rgba(255,255,255,0.45);
+    backdrop-filter: blur(18px);
+    border-radius: 20px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+    overflow: hidden;
+    max-width: 880px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
 /* ===== FORMS ===== */
 form {
-    background: #ffffffdd;
-    backdrop-filter: blur(2px);
-    padding: 1.5rem;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    margin: 1rem 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
-form div {
-    margin-bottom: 1.2rem;
+.table-actions form {
+    display: inline;
 }
 
-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-    color: #1e5631;
-}
+label { display: block; font-weight: 600; font-size: 0.82rem; margin-bottom: 4px; color: var(--text-secondary); }
 
 input, select, textarea {
     width: 100%;
-    padding: 0.7rem 1rem;
-    border: 1px solid #cbd5c0;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: 0.2s;
-    background: #fff;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+    color: var(--text-primary);
 }
 
 input:focus, select:focus, textarea:focus {
-    border-color: #ffc857;
+    border-color: var(--primary);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255,200,87,0.2);
+    box-shadow: 0 0 0 3px rgba(30, 107, 58, 0.12);
 }
 
-textarea {
-    min-height: 80px;
-    resize: vertical;
-}
+textarea { min-height: 80px; resize: vertical; }
 
-/* form error styling */
-.errorlist {
-    color: #c0392b;
-    font-size: 0.85rem;
-    list-style: none;
-    margin-top: 0.25rem;
-}
+.errorlist { color: var(--danger); font-size: 0.78rem; list-style: none; margin-top: 3px; }
 
-/* ===== TABLES ===== */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    margin: 1.5rem 0;
-}
-
-th, td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #e2e8e0;
-}
-
-th {
-    background: #eef3e9;
-    font-weight: 700;
-    color: #1e5631;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-}
-
-tr:hover {
-    background: #fef9e6;
-}
-
-/* ===== DASHBOARD CARDS ===== */
-.dashboard-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    margin: 2rem 0;
-}
-
-.card {
-    background: white;
-    padding: 1.2rem 2rem;
-    border-radius: 24px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    flex: 1;
-    min-width: 150px;
+/* ===== BUTTONS ===== */
+button, .btn, input[type="submit"], a.btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+    text-decoration: none;
     text-align: center;
-    border-top: 6px solid #ffc857;
+    font-family: 'DM Sans', sans-serif;
 }
 
-.card h3 {
-    font-size: 2rem;
-    margin: 0.5rem 0;
-    color: #2c7a42;
+button:hover, .btn:hover, input[type="submit"]:hover {
+    background: #155228;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-/* ===== PRODUCT GRID ===== */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.8rem;
-    margin: 2rem 0;
+.btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
 }
 
-.product-card {
-    background: white;
-    border-radius: 24px;
-    padding: 1.2rem;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.08);
-    transition: transform 0.2s;
+.btn-outline:hover { background: var(--primary); color: white; }
+
+.btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
 }
 
-.product-card:hover {
-    transform: translateY(-5px);
+@media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .main-content { margin-left: 0; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .activity-grid { grid-template-columns: 1fr; }
 }
 
-.product-card-image,
-.product-detail-image,
-.product-thumb {
-    display: block;
-    object-fit: cover;
-    border-radius: 18px;
-    background: #e8efe5;
+@media (max-width: 480px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .page-content { padding: 16px; }
 }
 
-.product-card-image {
-    width: 100%;
-    height: 180px;
-    margin-bottom: 1rem;
+/* ===== PUBLIC HOMEPAGE ===== */
+.agrigov-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: linear-gradient(90deg, #0c3b2d 0%, #0f5d44 52%, #1f7a63 100%);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.product-detail-image {
-    width: min(100%, 360px);
-    height: 240px;
-    margin: 0 0 1rem;
-}
-
-.product-thumb {
-    width: 72px;
-    height: 72px;
-}
-
-.product-card-image-placeholder,
-.product-thumb-placeholder {
+.agrigov-nav-inner {
+    min-height: 82px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.agrigov-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.65rem;
+}
+
+.agrigov-brand i {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    color: #587160;
-    font-size: 0.85rem;
+    background: transparent;
+    box-shadow: none;
+    font-size: 1rem;
+}
+
+.agrigov-nav-links {
+    gap: 10px;
+}
+
+.agrigov-navbar .navbar-collapse {
+    flex-grow: 1;
+    align-items: center;
+}
+
+.agrigov-nav-links .nav-link {
+    color: rgba(255,255,255,0.78);
+    font-weight: 600;
+    padding: 10px 14px !important;
+    font-size: 0.95rem;
+}
+
+.agrigov-nav-links .nav-link:hover,
+.agrigov-nav-links .nav-link:focus {
+    color: #fff;
+}
+
+.agrigov-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.agrigov-toggler {
+    border-color: rgba(255,255,255,0.24);
+}
+
+.agrigov-toggler .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+.agrigov-homepage {
+    margin: 0;
+    background:
+        radial-gradient(circle at top left, rgba(236, 194, 93, 0.16), transparent 22%),
+        radial-gradient(circle at bottom center, rgba(31, 122, 99, 0.08), transparent 26%),
+        linear-gradient(180deg, #fdfefe 0%, #f6faf8 48%, #ffffff 100%);
+    color: #143127;
+    overflow-x: clip;
+}
+
+.public-page-shell {
+    width: 100%;
+    padding: 0;
+}
+
+.agrigov-homepage .container {
+    max-width: 1280px;
+}
+
+.agrigov-section {
+    padding: 80px 0;
+}
+
+.agrigov-section-heading {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.agrigov-section-heading span,
+.agrigov-eyebrow,
+.agrigov-cta-card span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: rgba(113, 196, 126, 0.14);
+    color: #1f7a63;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.agrigov-section-heading h2,
+.agrigov-prices-intro h2,
+.agrigov-cta-card h2 {
+    font-size: clamp(2.2rem, 3.5vw, 3.15rem);
+    line-height: 1.06;
+    font-weight: 800;
+    color: #143127;
+    margin: 18px 0 0;
+}
+
+.agrigov-section-heading-inline {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    text-align: left;
+}
+
+.agrigov-text-link {
+    color: #1f7a63;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.agrigov-text-link i {
+    margin-left: 8px;
+}
+
+.agrigov-btn {
+    border-radius: 12px !important;
+    padding: 13px 22px !important;
+    font-weight: 700 !important;
+    border: 1px solid transparent !important;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.agrigov-btn-solid {
+    background: #1f7a63 !important;
+    color: #fff !important;
+    box-shadow: 0 14px 30px rgba(31, 122, 99, 0.22);
+}
+
+.agrigov-btn-solid:hover {
+    background: #186451 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(31, 122, 99, 0.28) !important;
+}
+
+.agrigov-btn-ghost {
+    background: transparent !important;
+    border-color: rgba(255,255,255,0.34) !important;
+    color: #fff !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.agrigov-btn-light {
+    background: #fff !important;
+    color: #173428 !important;
+    border: 1px solid rgba(18, 52, 40, 0.08) !important;
+    box-shadow: 0 12px 22px rgba(18, 52, 40, 0.08) !important;
+}
+
+.agrigov-btn-light:hover,
+.agrigov-btn-ghost:hover {
+    transform: translateY(-2px);
+}
+
+.agrigov-btn-light:hover {
+    background: #f5fbf8 !important;
+    border-color: rgba(31, 122, 99, 0.14) !important;
+    color: #145646 !important;
+}
+
+.agrigov-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 66px 0 34px;
+}
+
+.agrigov-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top right, rgba(238, 196, 97, 0.24), transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.94), rgba(248,251,249,0.92));
+    pointer-events: none;
+}
+
+.agrigov-hero .container {
+    position: relative;
+    z-index: 1;
+}
+
+.agrigov-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(360px, 0.94fr) minmax(500px, 1.06fr);
+    align-items: center;
+    gap: 54px;
+    margin: 0;
+}
+
+.agrigov-hero-grid > * {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+}
+
+.agrigov-hero-copy {
+    padding-right: 8px;
+}
+
+.agrigov-hero-media {
+    min-width: 0;
+}
+
+.agrigov-hero h1 {
+    font-size: clamp(3.3rem, 6vw, 5.3rem);
+    line-height: 0.92;
+    font-weight: 800;
+    color: #143127;
+    margin: 18px 0 14px;
+    max-width: 11ch;
+    letter-spacing: -0.05em;
+}
+
+.agrigov-hero h1 span {
+    color: #2aa56f;
+}
+
+.agrigov-hero-subtitle {
+    font-size: 2rem;
+    line-height: 1.18;
+    font-weight: 700;
+    color: #273a33;
+    max-width: 16ch;
+    margin-bottom: 20px;
+}
+
+.agrigov-hero p {
+    max-width: 54ch;
+    font-size: 1.08rem;
+    color: #5e7368;
+    margin-bottom: 30px;
+}
+
+.agrigov-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.agrigov-hero-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #45695d;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.agrigov-hero-note i {
+    color: #1f7a63;
+}
+
+.agrigov-hero-visual {
+    position: relative;
+    padding: 18px 18px 50px 28px;
+}
+
+.agrigov-hero-image-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    min-height: 520px;
+    box-shadow: 0 28px 60px rgba(21, 57, 46, 0.15);
+}
+
+.agrigov-hero-image-wrap img {
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.agrigov-hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(18, 67, 54, 0.3), rgba(31, 122, 99, 0.12), rgba(255,255,255,0));
+    z-index: 1;
+}
+
+.agrigov-floating-card {
+    position: absolute;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(31, 122, 99, 0.08);
+    box-shadow: 0 20px 40px rgba(20, 49, 39, 0.12);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+}
+
+.agrigov-card-top {
+    top: 24px;
+    right: -4px;
+    padding: 18px 20px;
+    min-width: 174px;
+}
+
+.agrigov-card-top strong {
+    display: block;
+    font-size: 2rem;
+    color: #143127;
+}
+
+.agrigov-card-top small,
+.agrigov-floating-label {
+    color: #6a857a;
+}
+
+.agrigov-floating-label {
+    display: block;
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+}
+
+.agrigov-card-middle {
+    left: -12px;
+    top: 220px;
+    padding: 18px 20px;
+    min-width: 156px;
+}
+
+.agrigov-card-middle strong {
+    display: block;
+    font-size: 1.8rem;
+    color: #143127;
+}
+
+.agrigov-card-bottom {
+    left: 18px;
+    bottom: 0;
+    width: min(86%, 470px);
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    font-weight: 700;
+    color: #143127;
+    align-items: center;
+}
+
+.agrigov-card-bottom i {
+    color: #1f7a63;
+    margin-right: 8px;
+}
+
+.agrigov-card-bottom > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92rem;
+}
+
+.agrigov-card-bottom small {
+    display: block;
+    color: #6a857a;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.agrigov-stats-section {
+    padding-top: 16px;
+}
+
+.agrigov-stats-grid {
+    background: rgba(255,255,255,0.86);
+    border: 1px solid rgba(31, 122, 99, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 24px 40px rgba(20, 49, 39, 0.08);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+}
+
+.agrigov-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 26px 28px;
+}
+
+.agrigov-stat-item + .agrigov-stat-item {
+    border-left: 1px solid rgba(31, 122, 99, 0.1);
+}
+
+.agrigov-stat-icon,
+.agrigov-feature-icon,
+.agrigov-step-icon,
+.agrigov-advantage-card i {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(31, 122, 99, 0.11);
+    color: #1f7a63;
+    font-size: 1.3rem;
+}
+
+.agrigov-stat-item strong {
+    display: block;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: #143127;
+}
+
+.agrigov-stat-item span {
+    color: #648176;
     font-weight: 600;
 }
 
-.product-card h4 {
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
+.agrigov-feature-card,
+.agrigov-step-card,
+.agrigov-product-card,
+.agrigov-advantage-card,
+.agrigov-testimonial-card,
+.agrigov-table-card,
+.agrigov-prices-intro,
+.agrigov-empty-card {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(31, 122, 99, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(20, 49, 39, 0.08);
 }
 
-/* ===== REGISTER FORM SPECIAL (transporter fields) ===== */
-.transporter-field {
-    transition: all 0.2s;
+.agrigov-feature-card {
+    padding: 30px;
+    height: 100%;
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
 }
 
-/* ===== FOOTER / UTILITIES ===== */
-.text-center { text-align: center; }
-.mt-4 { margin-top: 2rem; }
-.mb-2 { margin-bottom: 0.8rem; }
-.muted-note { color: #587160; font-size: 0.85rem; display: inline-block; margin-left: 0.5rem; }
+.agrigov-feature-card:hover,
+.agrigov-step-card:hover,
+.agrigov-product-card:hover,
+.agrigov-advantage-card:hover,
+.agrigov-testimonial-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 42px rgba(20, 49, 39, 0.12);
+    border-color: rgba(31, 122, 99, 0.18);
+}
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-        gap: 0.5rem;
-        padding: 1rem;
+.agrigov-feature-card h3,
+.agrigov-step-card h3,
+.agrigov-product-card h3,
+.agrigov-advantage-card h3 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #143127;
+    margin: 22px 0 12px;
+}
+
+.agrigov-feature-card p,
+.agrigov-step-card p,
+.agrigov-advantage-card p,
+.agrigov-testimonial-card p,
+.agrigov-prices-intro p,
+.agrigov-cta-card p,
+.agrigov-footer p {
+    color: #668276;
+    margin: 0;
+}
+
+.agrigov-feature-icon-blue {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+}
+
+.agrigov-feature-icon-amber {
+    background: rgba(245, 158, 11, 0.14);
+    color: #d97706;
+}
+
+.agrigov-steps-section {
+    background: linear-gradient(180deg, rgba(31, 122, 99, 0.05), rgba(255,255,255,0));
+}
+
+.agrigov-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    position: relative;
+}
+
+.agrigov-step-card {
+    position: relative;
+    padding: 26px 22px 22px;
+    text-align: center;
+}
+
+.agrigov-step-number {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #1f7a63;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.agrigov-products-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+}
+
+.agrigov-product-card {
+    overflow: hidden;
+}
+
+.agrigov-product-image {
+    height: 152px;
+    background: #dcebe4;
+}
+
+.agrigov-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.agrigov-product-body {
+    padding: 16px 16px 18px;
+}
+
+.agrigov-product-meta {
+    color: #1f7a63;
+    font-weight: 700;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(31, 122, 99, 0.1);
+    margin-bottom: 10px;
+}
+
+.agrigov-product-card h3 {
+    font-size: 1.08rem;
+    margin: 0 0 10px;
+}
+
+.agrigov-product-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #143127;
+    margin-bottom: 10px;
+}
+
+.agrigov-product-price span,
+.agrigov-product-location {
+    color: #648176;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.agrigov-product-location i {
+    color: #1f7a63;
+    margin-right: 8px;
+}
+
+.agrigov-empty-card {
+    grid-column: 1 / -1;
+    padding: 48px 30px;
+    text-align: center;
+}
+
+.agrigov-empty-card i {
+    font-size: 2rem;
+    color: #1f7a63;
+    margin-bottom: 14px;
+}
+
+.agrigov-prices-intro,
+.agrigov-table-card {
+    padding: 30px;
+    height: 100%;
+}
+
+.agrigov-badge {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(31, 122, 99, 0.12);
+    color: #1f7a63;
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+
+.agrigov-price-update {
+    margin: 16px 0 24px;
+    color: #648176;
+    font-weight: 600;
+}
+
+.agrigov-price-table thead th {
+    border: none;
+    color: #648176;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: transparent;
+    padding: 0 0 16px;
+}
+
+.agrigov-price-table tbody td {
+    padding: 18px 0;
+    border-color: rgba(31, 122, 99, 0.08);
+    color: #143127;
+    font-weight: 600;
+}
+
+.agrigov-advantages-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+
+.agrigov-advantage-card {
+    padding: 20px 16px;
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+    text-align: left;
+}
+
+.agrigov-advantage-card i {
+    margin-bottom: 16px;
+}
+
+.agrigov-advantage-card h3 {
+    font-size: 1.1rem;
+    margin: 0 0 8px;
+}
+
+.agrigov-advantage-card p {
+    font-size: 0.9rem;
+}
+
+.agrigov-testimonials-section {
+    background: linear-gradient(180deg, rgba(31, 122, 99, 0.04), rgba(255,255,255,0));
+}
+
+.agrigov-testimonials-row {
+    align-items: stretch;
+}
+
+.agrigov-testimonial-card {
+    padding: 28px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244, 251, 248, 0.96));
+}
+
+.agrigov-testimonial-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.agrigov-stars {
+    color: #f59e0b;
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+}
+
+.agrigov-quote-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(31, 122, 99, 0.09);
+    color: #1f7a63;
+}
+
+.agrigov-testimonial-copy {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #4e6c61 !important;
+}
+
+.agrigov-reviewer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid rgba(31, 122, 99, 0.1);
+}
+
+.agrigov-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1f7a63, #37a78d);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.15rem;
+}
+
+.agrigov-reviewer strong {
+    display: block;
+    color: #143127;
+    font-size: 1rem;
+}
+
+.agrigov-reviewer span {
+    color: #6a857a;
+    font-size: 0.92rem;
+}
+
+.agrigov-cta-card {
+    background: linear-gradient(135deg, #103428, #1f7a63 58%, #2f9c82);
+    border-radius: 18px;
+    padding: 54px 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 28px 50px rgba(16, 52, 40, 0.22);
+    text-align: center;
+}
+
+.agrigov-cta-content {
+    max-width: 760px;
+}
+
+.agrigov-cta-card h2,
+.agrigov-cta-card p {
+    color: #fff;
+}
+
+.agrigov-cta-card p {
+    margin-top: 12px;
+    max-width: 640px;
+    color: rgba(255,255,255,0.8);
+}
+
+.agrigov-cta-card span {
+    background: rgba(255,255,255,0.12);
+    color: #d6f7ee;
+}
+
+.agrigov-cta-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.agrigov-cta-actions .agrigov-btn {
+    min-width: 190px;
+    padding: 16px 28px !important;
+    font-size: 1rem;
+}
+
+.agrigov-footer {
+    background: #0d241d;
+    padding: 72px 0 54px;
+    margin-top: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.agrigov-footer-brand {
+    margin-bottom: 16px;
+}
+
+.agrigov-footer .agrigov-brand,
+.agrigov-footer .agrigov-brand span,
+.agrigov-footer .agrigov-brand i {
+    color: #fff;
+}
+
+.agrigov-footer h3 {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.agrigov-footer a,
+.agrigov-footer p {
+    display: block;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    margin-bottom: 14px;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.agrigov-footer .row > div {
+    min-width: 0;
+}
+
+.agrigov-footer a:hover {
+    color: #fff;
+    transform: translateX(4px);
+}
+
+.agrigov-footer p i {
+    color: #52c1a7;
+    margin-right: 10px;
+}
+
+.agrigov-footer-grid {
+    align-items: start;
+}
+
+.agrigov-footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.agrigov-socials {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.agrigov-socials a {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.agrigov-socials a:hover {
+    background: rgba(31, 122, 99, 0.4);
+    transform: translateY(-2px) !important;
+}
+
+@media (max-width: 1199px) {
+    .agrigov-products-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
-    .container {
-        padding: 0 1rem;
+
+    .agrigov-steps-grid,
+    .agrigov-advantages-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
-    table, thead, tbody, th, td, tr {
-        display: block;
+}
+
+@media (max-width: 991px) {
+    .agrigov-nav-inner {
+        gap: 16px;
     }
-    th {
-        display: none;
+
+    .agrigov-navbar .navbar-collapse {
+        background: rgba(10, 24, 19, 0.96);
+        border-radius: 16px;
+        padding: 14px 18px 18px;
+        margin-top: 12px;
     }
-    tr {
-        margin-bottom: 1rem;
-        border: 1px solid #ddd;
-        border-radius: 12px;
-        padding: 0.5rem;
+
+    .agrigov-nav-links {
+        padding: 16px 0;
     }
-    td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: none;
-        padding: 0.6rem;
+
+    .agrigov-nav-actions {
+        padding-bottom: 12px;
+        justify-content: flex-start;
     }
-    td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        width: 40%;
-        color: #1e5631;
+
+    .agrigov-hero {
+        padding-top: 40px;
     }
-    .dashboard-stats {
-        flex-direction: column;
-    }
-    .hero {
+
+    .agrigov-hero-grid {
         grid-template-columns: 1fr;
-        padding: 1.5rem;
+        gap: 32px;
     }
-    .feature-strip {
+
+    .agrigov-hero-copy {
+        padding-right: 0;
+    }
+
+    .agrigov-hero-image-wrap,
+    .agrigov-hero-image-wrap img {
+        min-height: 420px;
+    }
+
+    .agrigov-card-middle {
+        left: 18px;
+        top: auto;
+        bottom: 102px;
+    }
+
+    .agrigov-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .agrigov-stat-item:nth-child(3),
+    .agrigov-stat-item:nth-child(4) {
+        border-top: 1px solid rgba(31, 122, 99, 0.1);
+    }
+
+    .agrigov-stat-item:nth-child(3) {
+        border-left: none;
+    }
+
+    .agrigov-section-heading-inline,
+    .agrigov-cta-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 767px) {
+    .agrigov-section {
+        padding: 64px 0;
+    }
+
+    .agrigov-hero h1 {
+        max-width: none;
+    }
+
+    .agrigov-hero-subtitle {
+        max-width: none;
+        font-size: 1.45rem;
+    }
+
+    .agrigov-stats-grid,
+    .agrigov-steps-grid,
+    .agrigov-products-grid,
+    .agrigov-advantages-grid {
         grid-template-columns: 1fr;
     }
-    .hero-actions {
-        flex-direction: column;
+
+    .agrigov-stat-item + .agrigov-stat-item {
+        border-left: none;
+        border-top: 1px solid rgba(31, 122, 99, 0.1);
     }
-    .hero-actions .btn {
+
+    .agrigov-hero-actions,
+    .agrigov-cta-actions,
+    .agrigov-nav-actions {
         width: 100%;
+    }
+
+    .agrigov-hero-actions .agrigov-btn,
+    .agrigov-cta-actions .agrigov-btn,
+    .agrigov-nav-actions .agrigov-btn {
+        width: 100%;
+    }
+
+    .agrigov-floating-card {
+        position: static;
+        margin-top: 16px;
+    }
+
+    .agrigov-hero-visual {
+        padding: 0;
+    }
+
+    .agrigov-card-bottom {
+        width: 100%;
+        flex-direction: column;
+        left: 0;
+    }
+
+    .agrigov-card-middle,
+    .agrigov-card-top {
+        left: 0;
+        right: 0;
+    }
+
+    .agrigov-card-top {
+        right: 0;
+    }
+
+    .agrigov-prices-intro,
+    .agrigov-table-card,
+    .agrigov-feature-card,
+    .agrigov-step-card,
+    .agrigov-testimonial-card,
+    .agrigov-advantage-card {
+        padding: 24px;
+    }
+
+    .agrigov-cta-card {
+        padding: 36px 24px;
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .agrigov-cta-actions {
+        justify-content: flex-start;
+    }
+}
+
+/* ===== Homepage SaaS Overrides ===== */
+.agrigov-homepage {
+    background:
+        radial-gradient(circle at top left, rgba(236, 194, 93, 0.16), transparent 22%),
+        radial-gradient(circle at 70% 12%, rgba(31, 122, 99, 0.06), transparent 28%),
+        linear-gradient(180deg, #fdfefe 0%, #f6faf8 46%, #ffffff 100%);
+    color: #143127;
+}
+
+.agrigov-homepage .container {
+    max-width: 1220px;
+}
+
+.agrigov-section {
+    padding: 80px 0;
+}
+
+.agrigov-section-muted {
+    background: #f8fbf9;
+}
+
+.agrigov-section-soft {
+    background: linear-gradient(180deg, rgba(31, 122, 99, 0.05), rgba(255, 255, 255, 0));
+}
+
+.agrigov-navbar {
+    background: linear-gradient(90deg, #0c3b2d 0%, #0f5d44 56%, #1f7a63 100%);
+}
+
+.agrigov-navbar .agrigov-brand {
+    font-size: 1.1rem;
+    letter-spacing: 0;
+}
+
+.agrigov-navbar .agrigov-brand i {
+    font-size: 0.95rem;
+}
+
+.agrigov-nav-links .nav-link {
+    font-size: 0.9rem;
+}
+
+.agrigov-btn {
+    border-radius: 12px !important;
+    padding: 13px 22px !important;
+    font-weight: 700 !important;
+    gap: 8px;
+}
+
+.agrigov-btn-solid {
+    background: #1f7a63 !important;
+    color: #fff !important;
+    box-shadow: 0 14px 30px rgba(31, 122, 99, 0.22);
+}
+
+.agrigov-btn-light {
+    background: #fff !important;
+    color: #173428 !important;
+    border: 1px solid rgba(18, 52, 40, 0.08) !important;
+    box-shadow: 0 12px 22px rgba(18, 52, 40, 0.08) !important;
+}
+
+.agrigov-btn-ghost-light {
+    background: transparent !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.38) !important;
+    box-shadow: none !important;
+}
+
+.agrigov-btn-solid:hover,
+.agrigov-btn-light:hover,
+.agrigov-btn-ghost:hover,
+.agrigov-btn-ghost-light:hover {
+    transform: translateY(-2px);
+}
+
+.agrigov-btn-ghost-light:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+.agrigov-hero {
+    padding: 68px 0 104px;
+    overflow: hidden;
+}
+
+.agrigov-hero::before {
+    background:
+        radial-gradient(circle at top right, rgba(238, 196, 97, 0.22), transparent 24%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 251, 249, 0.92));
+}
+
+.agrigov-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(470px, 1fr);
+    align-items: center;
+    gap: 54px;
+}
+
+.agrigov-hero-copy {
+    max-width: 540px;
+}
+
+.agrigov-eyebrow {
+    background: rgba(113, 196, 126, 0.14);
+    color: #1f7a63;
+}
+
+.agrigov-hero h1 {
+    font-size: clamp(3.25rem, 6vw, 5.25rem);
+    line-height: 0.92;
+    margin: 18px 0 14px;
+    letter-spacing: -0.05em;
+    max-width: 11ch;
+}
+
+.agrigov-hero h1 span {
+    color: #2aa56f;
+}
+
+.agrigov-hero-subtitle {
+    font-size: 1.95rem;
+    line-height: 1.18;
+    font-weight: 700;
+    color: #273a33;
+    margin-bottom: 20px;
+    max-width: 16ch;
+}
+
+.agrigov-hero p {
+    max-width: 54ch;
+    font-size: 1.05rem;
+    color: #5e7368;
+    margin-bottom: 30px;
+}
+
+.agrigov-hero-note {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.agrigov-hero-visual {
+    position: relative;
+    padding: 18px 18px 56px 28px;
+}
+
+.agrigov-hero-image-wrap {
+    border-radius: 24px;
+    min-height: 520px;
+    box-shadow: 0 28px 60px rgba(21, 57, 46, 0.15);
+}
+
+.agrigov-hero-image-wrap img {
+    min-height: 520px;
+    object-position: center center;
+}
+
+.agrigov-floating-card {
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid rgba(31, 122, 99, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(20, 49, 39, 0.12);
+}
+
+.agrigov-card-top {
+    top: 24px;
+    right: -6px;
+    min-width: 176px;
+    padding: 18px 20px;
+}
+
+.agrigov-card-middle {
+    left: -12px;
+    top: 220px;
+    min-width: 156px;
+    padding: 18px 20px;
+}
+
+.agrigov-card-middle strong,
+.agrigov-card-top strong {
+    display: block;
+    color: #143127;
+}
+
+.agrigov-card-middle strong {
+    font-size: 1.8rem;
+}
+
+.agrigov-card-bottom {
+    left: 22px;
+    bottom: 0;
+    width: min(88%, 470px);
+    padding: 18px 22px;
+    border-radius: 18px;
+    align-items: center;
+}
+
+.agrigov-card-bottom > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.agrigov-card-bottom small {
+    display: block;
+    color: #6a857a;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.agrigov-stats-section {
+    position: relative;
+    z-index: 2;
+    margin-top: -58px;
+    padding: 0 0 34px;
+}
+
+.agrigov-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.agrigov-stat-item {
+    padding: 24px 28px;
+}
+
+.agrigov-stat-item strong {
+    font-size: 1.5rem;
+}
+
+.agrigov-stat-item span {
+    font-size: 0.9rem;
+}
+
+.agrigov-section-heading {
+    margin-bottom: 48px;
+}
+
+.agrigov-section-heading h2,
+.agrigov-prices-intro h2,
+.agrigov-cta-card h2 {
+    font-size: clamp(2.2rem, 3.5vw, 3.15rem);
+    line-height: 1.06;
+}
+
+.agrigov-inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    color: #1f7a63;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.agrigov-inline-link:hover {
+    color: #155f4c;
+}
+
+.agrigov-feature-card,
+.agrigov-step-card,
+.agrigov-product-card,
+.agrigov-advantage-card,
+.agrigov-testimonial-card,
+.agrigov-table-card,
+.agrigov-prices-intro,
+.agrigov-empty-card {
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(20, 49, 39, 0.08);
+}
+
+.agrigov-steps-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.agrigov-step-card {
+    text-align: center;
+    padding: 30px 22px 22px;
+}
+
+.agrigov-step-number {
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.agrigov-products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.agrigov-product-card {
+    overflow: hidden;
+}
+
+.agrigov-product-image {
+    height: 220px;
+}
+
+.agrigov-product-body {
+    padding: 20px;
+}
+
+.agrigov-product-meta {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(31, 122, 99, 0.1);
+    margin-bottom: 12px;
+    font-size: 0.72rem;
+}
+
+.agrigov-product-card h3 {
+    font-size: 1.12rem;
+    margin: 0 0 10px;
+}
+
+.agrigov-product-price {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.agrigov-prices-intro,
+.agrigov-table-card {
+    padding: 32px;
+}
+
+.agrigov-advantages-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.agrigov-advantage-card {
+    padding: 22px 18px;
+}
+
+.agrigov-testimonials-row {
+    align-items: stretch;
+}
+
+.agrigov-testimonial-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 251, 248, 0.96));
+}
+
+.agrigov-cta-card {
+    border-radius: 18px;
+    background: linear-gradient(135deg, #103428, #1f7a63 58%, #2f9c82);
+    padding: 54px 42px;
+    text-align: center;
+    align-items: center;
+}
+
+.agrigov-cta-actions {
+    justify-content: center;
+}
+
+.agrigov-cta-card .agrigov-btn-light {
+    background: #fff !important;
+    color: #145646 !important;
+}
+
+.agrigov-footer {
+    background: #0d241d;
+}
+
+.agrigov-footer .agrigov-brand {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 1199px) {
+    .agrigov-hero-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(420px, 1fr);
+        gap: 40px;
+    }
+
+    .agrigov-products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .agrigov-advantages-grid,
+    .agrigov-steps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 991px) {
+    .agrigov-hero {
+        padding: 52px 0 72px;
+    }
+
+    .agrigov-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .agrigov-hero-copy,
+    .agrigov-hero-subtitle {
+        max-width: none;
+    }
+
+    .agrigov-hero-image-wrap,
+    .agrigov-hero-image-wrap img {
+        min-height: 420px;
+    }
+
+    .agrigov-card-middle {
+        left: 18px;
+        top: auto;
+        bottom: 104px;
+    }
+
+    .agrigov-stats-section {
+        margin-top: -26px;
+    }
+
+    .agrigov-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .agrigov-stat-item:nth-child(3),
+    .agrigov-stat-item:nth-child(4) {
+        border-top: 1px solid rgba(31, 122, 99, 0.1);
+    }
+
+    .agrigov-stat-item:nth-child(3) {
+        border-left: none;
+    }
+
+    .agrigov-section-heading-inline,
+    .agrigov-cta-card {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .agrigov-cta-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 767px) {
+    .agrigov-section {
+        padding: 64px 0;
+    }
+
+    .agrigov-hero h1,
+    .agrigov-hero-subtitle {
+        max-width: none;
+    }
+
+    .agrigov-hero-subtitle {
+        font-size: 1.5rem;
+    }
+
+    .agrigov-products-grid,
+    .agrigov-steps-grid,
+    .agrigov-advantages-grid,
+    .agrigov-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .agrigov-stat-item + .agrigov-stat-item {
+        border-left: none;
+        border-top: 1px solid rgba(31, 122, 99, 0.1);
+    }
+
+    .agrigov-hero-actions,
+    .agrigov-cta-actions,
+    .agrigov-nav-actions {
+        width: 100%;
+    }
+
+    .agrigov-hero-actions .agrigov-btn,
+    .agrigov-cta-actions .agrigov-btn,
+    .agrigov-nav-actions .agrigov-btn {
+        width: 100%;
+    }
+
+    .agrigov-floating-card {
+        position: static;
+        margin-top: 16px;
+    }
+
+    .agrigov-hero-visual {
+        padding: 0;
+    }
+
+    .agrigov-card-bottom {
+        width: 100%;
+        left: 0;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .agrigov-prices-intro,
+    .agrigov-table-card,
+    .agrigov-feature-card,
+    .agrigov-step-card,
+    .agrigov-testimonial-card,
+    .agrigov-advantage-card {
+        padding: 24px;
+    }
+
+    .agrigov-cta-card {
+        padding: 36px 24px;
+    }
+}
+
+/* ===== UNIFIED MARKETPLACE THEME ===== */
+:root {
+    --agri-primary: #1f7a63;
+    --agri-primary-dark: #0f4338;
+    --agri-primary-soft: #e7f5f0;
+    --agri-primary-softer: #f4faf7;
+    --agri-surface: rgba(255, 255, 255, 0.96);
+    --agri-surface-soft: #f7fbf9;
+    --agri-border: rgba(15, 67, 56, 0.1);
+    --agri-border-strong: rgba(15, 67, 56, 0.16);
+    --agri-text: #143229;
+    --agri-muted: #6b847a;
+    --agri-shadow: 0 18px 44px rgba(15, 46, 38, 0.08);
+    --agri-shadow-lg: 0 24px 60px rgba(15, 46, 38, 0.12);
+}
+
+:root {
+    --primary: var(--agri-primary);
+    --primary-light: #2f9b81;
+    --surface: #ffffff;
+    --surface-2: #f4faf7;
+    --border: var(--agri-border);
+    --text-primary: var(--agri-text);
+    --text-secondary: var(--agri-muted);
+    --text-muted: #95aaa0;
+}
+
+body {
+    background: linear-gradient(180deg, #f8fcfa 0%, #f1f7f4 100%);
+    color: var(--agri-text);
+}
+
+.sidebar {
+    background: linear-gradient(180deg, #0d3f35 0%, #14584a 44%, #1f7a63 100%);
+    box-shadow: 24px 0 56px rgba(10, 35, 29, 0.18);
+}
+
+.sidebar-header {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+}
+
+.sidebar-menu h6 {
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.16em;
+}
+
+.sidebar-menu a {
+    margin: 3px 12px;
+    border-left: none;
+    border-radius: 14px;
+    font-weight: 600;
+}
+
+.sidebar-menu a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+}
+
+.sidebar-menu a.active {
+    background: rgba(255, 255, 255, 0.14);
+    border-left-color: transparent;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.sidebar-footer {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.sidebar-footer .user-avatar {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.top-navbar {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--agri-border);
+    box-shadow: 0 10px 30px rgba(15, 46, 38, 0.06);
+}
+
+.top-navbar .page-title {
+    color: var(--agri-text);
+    font-size: 1.35rem;
+}
+
+.top-navbar .nav-icon {
+    border: 1px solid var(--agri-border);
+    background: #fff;
+    color: var(--agri-text);
+    box-shadow: 0 8px 18px rgba(15, 46, 38, 0.04);
+}
+
+.top-navbar .nav-icon:hover {
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary);
+    border-color: rgba(31, 122, 99, 0.2);
+    transform: translateY(-1px);
+}
+
+.notifications-dropdown {
+    min-width: 320px;
+    max-width: 380px;
+}
+
+.notifications-dropdown {
+    /* translucent background and rounded corners */
+    background: rgba(255,255,255,0.92);
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 10px 30px rgba(12, 35, 25, 0.12);
+}
+
+.notification-item {
+    border-bottom: 1px solid rgba(15, 67, 56, 0.06);
+    border-radius: 8px;
+    margin: 6px 4px;
+    overflow: hidden;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item a {
+    padding: 16px 18px;
+}
+
+.notification-item.notification-unread {
+    background: rgba(34, 101, 52, 0.05);
+}
+
+.notification-item .small {
+    display: block;
+    margin-top: 6px;
+    color: #6c757d;
+}
+
+.top-navbar .profile-link {
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary);
+    border-color: rgba(31, 122, 99, 0.14);
+}
+
+.page-content {
+    padding: 28px 30px 36px;
+    background:
+        radial-gradient(circle at top right, rgba(31, 122, 99, 0.08), transparent 28%),
+        linear-gradient(180deg, #f8fcfa 0%, #f1f7f4 100%);
+}
+
+.page-content .card,
+.page-content .data-table {
+    background: var(--agri-surface);
+    border: 1px solid var(--agri-border);
+    border-radius: 24px;
+    box-shadow: var(--agri-shadow);
+    overflow: hidden;
+}
+
+.page-content .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(15, 67, 56, 0.08);
+    padding: 22px 24px 16px;
+}
+
+.page-content .card-body {
+    padding: 22px 24px;
+}
+
+.page-content .card-body.p-0 {
+    padding: 0 !important;
+}
+
+.page-content .table {
+    margin-bottom: 0;
+    --bs-table-bg: transparent;
+}
+
+.page-content .table th {
+    background: #f7fbf9;
+    color: #6f867d;
+    font-size: 0.77rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(15, 67, 56, 0.08);
+    padding: 16px 18px;
+}
+
+.page-content .table td {
+    padding: 16px 18px;
+    border-color: #edf3ef;
+    vertical-align: middle;
+    color: var(--agri-text);
+}
+
+.page-content .table-hover tbody tr:hover {
+    background: rgba(31, 122, 99, 0.03);
+}
+
+.page-content .badge {
+    border-radius: 999px;
+    padding: 0.48rem 0.72rem;
+    font-weight: 700;
+}
+
+.page-content .btn-primary,
+.page-content .btn-success {
+    background: var(--agri-primary);
+    border-color: var(--agri-primary);
+    border-radius: 999px;
+    padding: 0.78rem 1.15rem;
+    font-weight: 700;
+    box-shadow: 0 12px 26px rgba(31, 122, 99, 0.16);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.page-content .btn-primary:hover,
+.page-content .btn-success:hover {
+    background: var(--agri-primary-dark);
+    border-color: var(--agri-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 16px 30px rgba(31, 122, 99, 0.2);
+}
+
+.page-content .btn-outline-primary,
+.page-content .btn-outline,
+.page-content .btn-outline-light {
+    background: #fff;
+    color: var(--agri-primary);
+    border-color: rgba(31, 122, 99, 0.16);
+    border-radius: 999px;
+    padding: 0.78rem 1.15rem;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.page-content .btn-outline-primary:hover,
+.page-content .btn-outline:hover,
+.page-content .btn-outline-light:hover {
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary-dark);
+    border-color: rgba(31, 122, 99, 0.24);
+    transform: translateY(-1px);
+}
+
+.page-content .btn-outline-warning,
+.page-content .btn-warning {
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.page-content .btn-outline-danger,
+.page-content .btn-danger {
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.page-content .form-control,
+.page-content .form-select {
+    border-radius: 14px;
+    border: 1px solid var(--agri-border);
+    min-height: 44px;
+}
+
+.page-content .form-control:focus,
+.page-content .form-select:focus {
+    border-color: rgba(31, 122, 99, 0.42);
+    box-shadow: 0 0 0 4px rgba(31, 122, 99, 0.08);
+}
+
+.page-content .progress {
+    background: #edf4f0;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.page-content .progress-bar {
+    background: linear-gradient(90deg, #1f7a63, #54b69a);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.44rem 0.78rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    border: 1px solid transparent;
+}
+
+.status-pending {
+    background: #fff6de;
+    color: #9a6a00;
+    border-color: #f3ddb0;
+}
+
+.status-confirmed {
+    background: #eaf3ff;
+    color: #2559c9;
+    border-color: #cadcff;
+}
+
+.status-shipped {
+    background: #edf7ff;
+    color: #0e7490;
+    border-color: #c9e7f3;
+}
+
+.status-delivered {
+    background: #eaf8f0;
+    color: #187a53;
+    border-color: #cdecd9;
+}
+
+.status-cancelled {
+    background: #fff0f0;
+    color: #c03b3b;
+    border-color: #f2d1d1;
+}
+
+.role-dashboard {
+    display: grid;
+    gap: 22px;
+}
+
+.role-hero {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.9fr);
+    gap: 24px;
+    padding: 32px;
+    background: linear-gradient(135deg, #ffffff 0%, #f5fbf8 58%, #ecf6f1 100%);
+    border: 1px solid var(--agri-border);
+    border-radius: 28px;
+    box-shadow: var(--agri-shadow-lg);
+}
+
+.role-hero::after {
+    content: '';
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    right: -80px;
+    bottom: -90px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(31, 122, 99, 0.16), transparent 70%);
+    pointer-events: none;
+}
+
+.role-hero-copy,
+.role-hero-side {
+    position: relative;
+    z-index: 1;
+}
+
+.role-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    margin-bottom: 16px;
+}
+
+.role-hero h1 {
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.08;
+    font-weight: 800;
+    color: var(--agri-text);
+    margin: 0 0 14px;
+    max-width: 14ch;
+}
+
+.role-hero p {
+    color: var(--agri-muted);
+    font-size: 1rem;
+    line-height: 1.72;
+    max-width: 62ch;
+    margin-bottom: 20px;
+}
+
+.role-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.role-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.role-metric {
+    min-width: 132px;
+}
+
+.role-metric strong {
+    display: block;
+    font-size: 1.22rem;
+    font-weight: 800;
+    color: var(--agri-text);
+}
+
+.role-metric span {
+    display: block;
+    color: var(--agri-muted);
+    font-size: 0.84rem;
+}
+
+.role-note-card {
+    background: linear-gradient(180deg, rgba(31, 122, 99, 0.08), rgba(255, 255, 255, 0.96));
+    border: 1px solid rgba(31, 122, 99, 0.12);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.role-note-card h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--agri-text);
+    margin-bottom: 8px;
+}
+
+.role-note-card p {
+    font-size: 0.92rem;
+    color: var(--agri-muted);
+    line-height: 1.65;
+    margin: 0;
+}
+
+.role-note-stack {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.role-note-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--agri-border);
+}
+
+.role-note-line span {
+    color: var(--agri-muted);
+    font-size: 0.82rem;
+}
+
+.role-note-line strong {
+    color: var(--agri-text);
+    font-weight: 800;
+}
+
+.role-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.role-stats-grid.role-stats-grid-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.role-stat-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px;
+    border-radius: 22px;
+    border: 1px solid var(--agri-border);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: var(--agri-shadow);
+}
+
+.role-stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.18rem;
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary);
+}
+
+.role-stat-card[data-tone="blue"] .role-stat-icon {
+    background: #eaf3ff;
+    color: #2563eb;
+}
+
+.role-stat-card[data-tone="amber"] .role-stat-icon {
+    background: #fff3e4;
+    color: #f59e0b;
+}
+
+.role-stat-card[data-tone="rose"] .role-stat-icon {
+    background: #ffe9ec;
+    color: #e11d48;
+}
+
+.role-stat-card[data-tone="violet"] .role-stat-icon {
+    background: #f4edff;
+    color: #7c3aed;
+}
+
+.role-stat-copy small {
+    display: block;
+    margin-bottom: 8px;
+    color: #73877f;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.role-stat-copy strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--agri-text);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.role-stat-copy span {
+    display: block;
+    color: var(--agri-muted);
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+.role-section-card {
+    background: var(--agri-surface);
+    border: 1px solid var(--agri-border);
+    border-radius: 24px;
+    box-shadow: var(--agri-shadow);
+    overflow: hidden;
+}
+
+.role-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 22px 24px 0;
+}
+
+.role-section-head h2 {
+    margin: 0;
+    color: var(--agri-text);
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.role-section-head p {
+    margin: 6px 0 0;
+    color: var(--agri-muted);
+    font-size: 0.92rem;
+}
+
+.role-section-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.role-section-body {
+    padding: 22px 24px 24px;
+}
+
+.role-section-body.role-table-wrap {
+    padding: 0;
+}
+
+.role-mini-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.role-mini-card {
+    padding: 18px;
+    border-radius: 20px;
+    border: 1px solid var(--agri-border);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbf9 100%);
+}
+
+.role-mini-card h3,
+.role-mini-card h4,
+.role-mini-card h6 {
+    margin-bottom: 8px;
+    color: var(--agri-text);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.role-mini-card p,
+.role-mini-card small {
+    color: var(--agri-muted);
+    line-height: 1.6;
+}
+
+.role-inline-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: rgba(31, 122, 99, 0.08);
+    border: 1px solid rgba(31, 122, 99, 0.12);
+    color: var(--agri-text);
+    font-weight: 700;
+}
+
+.role-empty {
+    text-align: center;
+    padding: 54px 20px;
+    color: var(--agri-muted);
+}
+
+.role-empty i {
+    display: block;
+    margin-bottom: 14px;
+    font-size: 2.6rem;
+    color: #bfd3c9;
+}
+
+.role-empty h3,
+.role-empty h4 {
+    margin-bottom: 8px;
+    color: var(--agri-text);
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.role-dual-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.95fr;
+    gap: 20px;
+}
+
+.role-stack {
+    display: grid;
+    gap: 18px;
+}
+
+.role-kpi-list,
+.role-progress-list,
+.role-info-list {
+    display: grid;
+    gap: 12px;
+}
+
+.role-kpi-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--agri-border);
+    background: #fff;
+}
+
+.role-kpi-row span {
+    color: var(--agri-muted);
+}
+
+.role-kpi-row strong {
+    color: var(--agri-text);
+    font-weight: 800;
+}
+
+.role-progress-item label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+    color: var(--agri-text);
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.role-progress-bar {
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #edf4f0;
+}
+
+.role-progress-bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #1f7a63, #54b69a);
+}
+
+.role-info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eff4f1;
+}
+
+.role-info-row:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.role-info-row span {
+    color: var(--agri-muted);
+}
+
+.role-link-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.role-link-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    border: 1px solid var(--agri-border);
+    background: #fff;
+    color: var(--agri-text);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.role-link-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--agri-shadow);
+    border-color: rgba(31, 122, 99, 0.18);
+    color: var(--agri-text);
+}
+
+.role-link-card i {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary);
+}
+
+.role-link-card strong {
+    display: block;
+    font-size: 0.96rem;
+}
+
+.role-link-card span {
+    display: block;
+    color: var(--agri-muted);
+    font-size: 0.82rem;
+}
+
+.role-thumb,
+.role-user-thumb {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--agri-border);
+}
+
+.role-thumb-fallback {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid var(--agri-border);
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary);
+}
+
+.role-rating-forms {
+    min-width: 220px;
+    display: grid;
+    gap: 8px;
+}
+
+.role-form-inline,
+.role-action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.role-map-shell {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--agri-border);
+    background: #eef6f2;
+}
+
+.role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--agri-primary-soft);
+    color: var(--agri-primary);
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+@media (max-width: 1200px) {
+    .role-stats-grid,
+    .role-stats-grid.role-stats-grid-three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .role-dual-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .page-content {
+        padding: 22px 18px 28px;
+    }
+
+    .top-navbar {
+        padding: 0 18px;
+    }
+
+    .role-hero {
+        grid-template-columns: 1fr;
+        padding: 26px;
+    }
+}
+
+@media (max-width: 768px) {
+    .role-stats-grid,
+    .role-stats-grid.role-stats-grid-three,
+    .role-mini-grid,
+    .role-link-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .role-section-head {
+        flex-direction: column;
+    }
+
+    .role-actions {
+        width: 100%;
+    }
+
+    .role-actions .btn {
+        width: 100%;
+    }
+
+    .role-rating-forms {
+        min-width: 0;
+    }
+
+    .page-content .table th,
+    .page-content .table td {
+        padding: 13px 14px;
     }
 }

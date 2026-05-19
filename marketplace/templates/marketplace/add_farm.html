@@ -1,9 +1,129 @@
 {% extends 'marketplace/base.html' %}
+{% block page_title %}Add Farm{% endblock %}
+
+{% block extra_css %}
+<style>
+  .farmer-page-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/media/products/5789403159968026335_121.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 48px 20px;
+  }
+  .farmer-page-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.12);
+    z-index: 0;
+  }
+  .farmer-page-background .farmer-content-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .farmer-page-background .card {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(255,255,255,0.24);
+    backdrop-filter: blur(10px);
+  }
+  .farmer-page-background .card-body { background: transparent; }
+  .farmer-page-background .form-control,
+  .farmer-page-background textarea {
+    background: rgba(255,255,255,0.9);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Add Farm</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Farm</button>
-</form>
+<div class="farmer-page-background">
+  <div class="farmer-content-container">
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body p-4">
+                <h4 class="mb-4"><i class="fas fa-seedling text-success me-2"></i>Add New Farm</h4>
+                <p class="text-muted mb-4">Register your agricultural farm with the platform.</p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Farm Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Street</label>
+                            {{ form.street }}
+                            {% if form.street.errors %}
+                                <div class="text-danger small">{{ form.street.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">City</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                                <div class="text-danger small">{{ form.city.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Wilaya</label>
+                            {{ form.wilaya }}
+                            {% if form.wilaya.errors %}
+                                <div class="text-danger small">{{ form.wilaya.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Postal Code</label>
+                            {{ form.postal_code }}
+                            {% if form.postal_code.errors %}
+                                <div class="text-danger small">{{ form.postal_code.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Legacy Location</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="text-danger small">{{ form.location.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Area (hectares)</label>
+                            {{ form.area_hectares }}
+                            {% if form.area_hectares.errors %}
+                                <div class="text-danger small">{{ form.area_hectares.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="fas fa-save me-2"></i>Save Farm
+                        </button>
+                        <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+  </div>
+</div>
 {% endblock %}

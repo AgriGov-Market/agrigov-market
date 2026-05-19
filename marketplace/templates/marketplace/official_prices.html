@@ -1,44 +1,288 @@
 {% extends 'marketplace/base.html' %}
+{% block page_title %}Official Market Prices{% endblock %}
+
+{% block extra_css %}
+<style>
+    .official-prices-background {
+        position: relative;
+        background-image: url('/media/products/connor-gan-l2LhqIQMo04-unsplash.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        border-radius: 24px;
+        padding: 32px;
+        overflow: hidden;
+    }
+    .official-prices-background::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.12);
+        z-index: 0;
+        border-radius: 24px;
+    }
+    .official-prices-background > * {
+        position: relative;
+        z-index: 1;
+    }
+    .official-prices-background .card {
+        background: rgba(255, 255, 255, 0.72);
+        border-color: rgba(255, 255, 255, 0.28);
+        backdrop-filter: blur(14px);
+    }
+    .official-prices-background .table {
+        background: rgba(255, 255, 255, 0.58);
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .official-prices-background .table thead th,
+    .official-prices-background .table tbody td {
+        background: rgba(255, 255, 255, 0.52);
+    }
+    .official-prices-background .table thead th {
+        color: #111;
+        font-weight: 700;
+    }
+    .official-prices-background .table-responsive,
+    .official-prices-background .card-body,
+    .official-prices-background .list-group-item {
+        background: transparent;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Official Market Prices</h2>
+<div class="official-prices-background">
+<div class="row mb-4">
+    <div class="col-12">
+        <h4><i class="fas fa-tags text-success me-2"></i>Official Market Prices</h4>
+        <p class="text-muted">Ministry of Agriculture reference prices for agricultural products</p>
+    </div>
+</div>
 
-<h3>Ministry Product Categories</h3>
-<table>
-    <thead><tr><th>Category</th><th>Status</th></tr></thead>
-    <tbody>
-    {% for category in categories %}
-        <tr><td>{{ category.name }}</td><td>{% if category.is_active %}Active{% else %}Inactive{% endif %}</td></tr>
-    {% empty %}
-        <tr><td colspan="2">No product categories set yet.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <form method="get" class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="fas fa-filter text-success me-2"></i>Filter by Category</h5>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label class="form-label">Main Category</label>
+                        <select name="parent_category" class="form-select">
+                            <option value="">Show all subcategory prices</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if selected_parent and selected_parent.id == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success w-100">Show Prices</button>
+                    </div>
+                </div>
+                {% if selected_parent %}
+                <div class="alert alert-info mt-3 mb-0">
+                    Showing prices for subcategories of <strong>{{ selected_parent.name }}</strong>.
+                </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body">
+                <h5 class="mb-4"><i class="fas fa-plus-circle text-success me-2"></i>Add New Price</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_price">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">Commodity</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Price per kg (DA)</label>
+                        {{ form.price_per_kg }}
+                        {% if form.price_per_kg.errors %}<div class="text-danger small">{{ form.price_per_kg.errors }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Add Price
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm mt-3" style="border-radius: 12px;">
+            <div class="card-body">
+                <h5 class="mb-4"><i class="fas fa-plus-circle text-success me-2"></i>Add Category / Subcategory</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_category">
+                    {% if category_form.non_field_errors %}
+                        <div class="alert alert-danger">{{ category_form.non_field_errors }}</div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">Category Name</label>
+                        {{ category_form.name }}
+                        {% if category_form.name.errors %}<div class="text-danger small">{{ category_form.name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Parent Category</label>
+                        {{ category_form.parent }}
+                        {% if category_form.parent.errors %}<div class="text-danger small">{{ category_form.parent.errors }}</div>{% endif %}
+                    </div>
+                    <div class="row gx-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Minimum Price (DA/kg)</label>
+                            {{ category_form.min_price }}
+                            {% if category_form.min_price.errors %}<div class="text-danger small">{{ category_form.min_price.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Maximum Price (DA/kg)</label>
+                            {{ category_form.max_price }}
+                            {% if category_form.max_price.errors %}<div class="text-danger small">{{ category_form.max_price.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-check mb-3">
+                        {{ category_form.is_active }}
+                        <label class="form-check-label">Active</label>
+                        {% if category_form.is_active.errors %}<div class="text-danger small">{{ category_form.is_active.errors }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Add Category
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
 
-<table>
-    <thead><tr><th>Commodity</th><th>Price per kg (DA)</th><th>Effective Date</th></tr></thead>
-    <tbody>
-    {% for price in prices %}
-        <tr><td>{{ price.commodity }}</td><td>{{ price.price_per_kg }}</td><td>{{ price.effective_date }}</td></tr>
-    {% empty %}
-        <tr><td colspan="3">No prices set yet.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+<!-- Price Table -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="px-4 py-3"><i class="fas fa-box me-2"></i>Commodity</th>
+                        <th class="px-4 py-3"><i class="fas fa-tag me-2"></i>Price per kg (DA)</th>
+                        <th class="px-4 py-3"><i class="fas fa-calendar me-2"></i>Effective Date</th>
+                        {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+                        <th class="px-4 py-3 text-end">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for price in prices %}
+                    <tr>
+                        <td class="px-4 py-3"><strong>{{ price.commodity }}</strong></td>
+                        <td class="px-4 py-3"><span class="badge bg-success">{{ price.price_per_kg }} DA</span></td>
+                        <td class="px-4 py-3 text-muted">{{ price.effective_date|date:"M d, Y" }}</td>
+                        {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+                        <td class="px-4 py-3 text-end">
+                            <a href="{% url 'edit_official_price' price.id %}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                            <form method="post" action="{% url 'delete_official_price' price.id %}" class="d-inline-block">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="{% if user.is_authenticated and user.userprofile.user_type == 'admin' %}4{% else %}3{% endif %}" class="text-center py-5 text-muted">
+                            <i class="fas fa-tags" style="font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                            {% if selected_parent %}
+                                No official prices set for {{ selected_parent.name }} subcategories yet.
+                            {% else %}
+                                No official prices set yet.
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-{% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
-    <h3>Add Product Category</h3>
-    <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="add_category">
-        {{ category_form.as_p }}
-        <button type="submit">Add Category</button>
-    </form>
-
-    <h3>Add New Price</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Price</button>
-    </form>
-{% endif %}
+<!-- Categories -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body">
+                <h5 class="mb-4"><i class="fas fa-th-large text-success me-2"></i>Product Categories</h5>
+                {% if categories %}
+                <div class="list-group list-group-flush">
+                    {% for category in categories %}
+                    <div class="list-group-item px-0 border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ category.name }}</h6>
+                                {% if category.min_price and category.max_price %}
+                                    <small class="text-muted">Price range: DA {{ category.min_price }} - {{ category.max_price }}/kg</small>
+                                {% else %}
+                                    <small class="text-muted">Price range not set</small>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                <span class="badge {% if category.is_active %}bg-success{% else %}bg-secondary{% endif %} align-self-start">
+                                    {% if category.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                                {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+                                <div class="mt-2">
+                                    <a href="{% url 'edit_category' category.id %}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                                    <form method="post" action="{% url 'delete_category' category.id %}" class="d-inline-block">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% for sub in category.subcategories.all %}
+                        <div class="ms-4 mt-3 p-3 rounded-3" style="background: #f8f9fa;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>↳ {{ sub.name }}</strong>
+                                    {% if sub.min_price and sub.max_price %}
+                                        <div class="small text-muted mt-1">Price range: DA {{ sub.min_price }} - {{ sub.max_price }}/kg</div>
+                                    {% else %}
+                                        <div class="small text-muted mt-1">Price range not set</div>
+                                    {% endif %}
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge {% if sub.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {% if sub.is_active %}Active{% else %}Inactive{% endif %}
+                                    </span>
+                                    {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+                                    <div class="mt-2">
+                                        <a href="{% url 'edit_category' sub.id %}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                                        <form method="post" action="{% url 'delete_category' sub.id %}" class="d-inline-block">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p class="text-muted">No categories defined</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 {% endblock %}

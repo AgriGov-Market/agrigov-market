@@ -1,0 +1,167 @@
+{% extends 'marketplace/base.html' %}
+{% block page_title %}Categories{% endblock %}
+
+{% block extra_css %}
+<style>
+    .categories-background {
+        position: relative;
+        background-image: url('/media/products/connor-gan-l2LhqIQMo04-unsplash.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        border-radius: 24px;
+        padding: 32px;
+        overflow: hidden;
+    }
+    .categories-background::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.12);
+        z-index: 0;
+        border-radius: 24px;
+    }
+    .categories-background > * {
+        position: relative;
+        z-index: 1;
+    }
+    .categories-background .card {
+        background: rgba(255, 255, 255, 0.72);
+        border-color: rgba(255, 255, 255, 0.28);
+        backdrop-filter: blur(14px);
+    }
+    .categories-background .list-group-item,
+    .categories-background .card-body,
+    .categories-background .form-control,
+    .categories-background .form-check {
+        background: transparent;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="categories-background">
+<div class="row mb-4">
+    <div class="col-12">
+        <h4><i class="fas fa-th-large text-success me-2"></i>Product Categories</h4>
+        <p class="text-muted">View and manage category hierarchy for product listings.</p>
+    </div>
+</div>
+
+{% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+    <div class="card-body">
+        <h5 class="mb-4"><i class="fas fa-plus-circle text-success me-2"></i>Add Category / Subcategory</h5>
+        {% if category_form.non_field_errors %}
+            <div class="alert alert-danger">{{ category_form.non_field_errors }}</div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_category">
+            <div class="mb-3">
+                <label class="form-label">Category Name</label>
+                {{ category_form.name }}
+                {% if category_form.name.errors %}<div class="text-danger small">{{ category_form.name.errors }}</div>{% endif %}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Parent Category</label>
+                {{ category_form.parent }}
+                {% if category_form.parent.errors %}<div class="text-danger small">{{ category_form.parent.errors }}</div>{% endif %}
+            </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Minimum Price (DA/kg)</label>
+                    {{ category_form.min_price }}
+                    {% if category_form.min_price.errors %}<div class="text-danger small">{{ category_form.min_price.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Maximum Price (DA/kg)</label>
+                    {{ category_form.max_price }}
+                    {% if category_form.max_price.errors %}<div class="text-danger small">{{ category_form.max_price.errors }}</div>{% endif %}
+                </div>
+            </div>
+            <div class="form-check mb-3">
+                {{ category_form.is_active }}
+                <label class="form-check-label">Active</label>
+                {% if category_form.is_active.errors %}<div class="text-danger small">{{ category_form.is_active.errors }}</div>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Add Category
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+    <div class="card-body">
+        <h5 class="mb-4"><i class="fas fa-list-alt text-success me-2"></i>Category Hierarchy</h5>
+        {% if categories %}
+            <div class="list-group list-group-flush">
+                {% for category in categories %}
+                    <div class="list-group-item px-0 border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ category.name }}</h6>
+                                {% if category.min_price and category.max_price %}
+                                    <small class="text-muted">Price range: DA {{ category.min_price }} - {{ category.max_price }}/kg</small>
+                                {% else %}
+                                    <small class="text-muted">Price range not set</small>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                <span class="badge {% if category.is_active %}bg-success{% else %}bg-secondary{% endif %} align-self-start">
+                                    {% if category.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                                {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+                                <div class="mt-2">
+                                    <a href="{% url 'edit_category' category.id %}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                                    <form method="post" action="{% url 'delete_category' category.id %}" class="d-inline-block">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if category.subcategories.all %}
+                        <div class="ms-4 mt-3 p-3 rounded-3" style="background: #f8f9fa;">
+                            {% for sub in category.subcategories.all %}
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <strong>↳ {{ sub.name }}</strong>
+                                    {% if sub.min_price and sub.max_price %}
+                                        <div class="small text-muted mt-1">Price range: DA {{ sub.min_price }} - {{ sub.max_price }}/kg</div>
+                                    {% else %}
+                                        <div class="small text-muted mt-1">Price range not set</div>
+                                    {% endif %}
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge {% if sub.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {% if sub.is_active %}Active{% else %}Inactive{% endif %}
+                                    </span>
+                                    {% if user.is_authenticated and user.userprofile.user_type == 'admin' %}
+                                    <div class="mt-2">
+                                        <a href="{% url 'edit_category' sub.id %}" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                                        <form method="post" action="{% url 'delete_category' sub.id %}" class="d-inline-block">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No categories defined.</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

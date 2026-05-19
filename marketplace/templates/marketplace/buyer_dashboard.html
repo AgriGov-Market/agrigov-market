@@ -1,17 +1,260 @@
 {% extends 'marketplace/base.html' %}
-{% block content %}
-<h2>Buyer Dashboard</h2>
-<a href="{% url 'product_list' %}" class="btn">Browse Products</a>
+{% load custom_filters %}
+{% block page_title %}Buyer Dashboard{% endblock %}
 
-<h3>My Orders</h3>
-<table>
-    <thead><tr><th>Product</th><th>Quantity</th><th>Total Price</th><th>Status</th></tr></thead>
-    <tbody>
-    {% for order in orders %}
-        <tr><td>{{ order.product.display_name }}</td><td>{{ order.quantity }}</td><td>DA {{ order.total_price }}</td><td>{{ order.status }}</td></tr>
-    {% empty %}
-        <tr><td colspan="4">No orders yet.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+{% block extra_css %}
+<style>
+    .buyer-dashboard-background {
+        position: relative;
+        min-height: 100vh;
+        background-image: url('/media/products/5789403159968026352_121.jpg');
+        /* show the full image without cropping; may leave side gutters depending on viewport */
+        background-size: contain;
+        background-position: center top;
+        background-repeat: no-repeat;
+        /* keep background fixed when scrolling */
+        background-attachment: fixed;
+        padding: 48px 20px;
+        background-color: #fbfbfb;
+    }
+    .buyer-dashboard-background::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        /* lighter overlay to make background image appear brighter */
+        background: rgba(255,255,255,0.08);
+        z-index: 0;
+    }
+    .buyer-dashboard-background .buyer-dashboard-content {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        color: #111;
+    }
+    .buyer-dashboard-background .role-hero-copy,
+    .buyer-dashboard-background .role-note-card,
+    .buyer-dashboard-background .role-section-body,
+    .buyer-dashboard-background .role-stat-card,
+    .buyer-dashboard-background .role-section-card,
+    .buyer-dashboard-background table.table {
+        background: rgba(255,255,255,0.82);
+        backdrop-filter: blur(8px);
+        border-radius: 12px;
+    }
+    .buyer-dashboard-background .role-hero {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 20px;
+        align-items: start;
+        padding: 28px;
+        border-radius: 16px;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.12);
+    }
+    .buyer-dashboard-background .role-note-card { padding: 18px; }
+    .buyer-dashboard-background .role-hero-copy { padding: 18px; }
+    .buyer-dashboard-background .role-stat-card { padding: 18px; }
+    .buyer-dashboard-background .role-section-card { padding: 18px; }
+    .buyer-dashboard-background .role-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
+    .buyer-dashboard-background .role-empty { background: rgba(255,255,255,0.9); padding: 36px; border-radius: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="buyer-dashboard-background">
+    <div class="buyer-dashboard-content">
+        <div class="role-dashboard">
+    <section class="role-hero">
+        <div class="role-hero-copy">
+            <span class="role-kicker"><i class="fas fa-cart-shopping"></i> Buyer workspace</span>
+            <h1>Browse faster, track orders clearly, and buy with confidence.</h1>
+            <p>Your dashboard keeps recent orders, delivery status, and seller relationships in one clean marketplace view.</p>
+            <div class="role-actions">
+                <a href="{% url 'product_list' %}" class="btn btn-primary"><i class="fas fa-search me-2"></i>Browse Products</a>
+            </div>
+            <div class="role-metrics">
+                <div class="role-metric">
+                    <strong>{{ orders|length }}</strong>
+                    <span>Total orders placed</span>
+                </div>
+                <div class="role-metric">
+                    <strong>{{ delivered_orders_count }}</strong>
+                    <span>Successful deliveries</span>
+                </div>
+                <div class="role-metric">
+                    <strong>{{ active_orders_count }}</strong>
+                    <span>Orders in progress</span>
+                </div>
+            </div>
+        </div>
+        <div class="role-hero-side">
+            <div class="role-note-card">
+                <h3>Buyer trust profile</h3>
+                <p>Use ratings, delivery visibility, and order history to keep purchasing decisions simple and transparent.</p>
+                <div class="role-note-stack">
+                    <div class="role-note-line">
+                        <span>Buyer rating</span>
+                        <strong>{{ my_rating.avg|default:"No ratings" }}{% if my_rating.count %} / 5{% endif %}</strong>
+                    </div>
+                    <div class="role-note-line">
+                        <span>Reviews received</span>
+                        <strong>{{ my_rating.count|default:"0" }}</strong>
+                    </div>
+                    <div class="role-note-line">
+                        <span>Products discoverable</span>
+                        <strong>{{ products|length }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="role-stats-grid role-stats-grid-three">
+        <article class="role-stat-card" data-tone="blue">
+            <div class="role-stat-icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="role-stat-copy">
+                <small>Total Orders</small>
+                <strong>{{ orders|length }}</strong>
+                <span>Everything you have ordered on the marketplace.</span>
+            </div>
+        </article>
+        <article class="role-stat-card">
+            <div class="role-stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="role-stat-copy">
+                <small>Delivered</small>
+                <strong>{{ delivered_orders_count }}</strong>
+                <span>Orders already completed and delivered.</span>
+            </div>
+        </article>
+        <article class="role-stat-card" data-tone="amber">
+            <div class="role-stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="role-stat-copy">
+                <small>In Progress</small>
+                <strong>{{ active_orders_count }}</strong>
+                <span>Orders currently awaiting confirmation or shipment.</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="role-section-card">
+        <div class="role-section-head">
+            <div>
+                <h2>My Orders</h2>
+                <p>Follow each order from product selection through delivery and final ratings.</p>
+            </div>
+        </div>
+        {% if orders %}
+        <div class="role-section-body role-table-wrap">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Farmer</th>
+                            <th>Transporter</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Delivery Address</th>
+                            <th>Interactions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><strong>#{{ order.id }}</strong></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if order.product.image_url %}
+                                    <img src="{{ order.product.image_url }}" alt="{{ order.product.display_name }}" class="role-thumb">
+                                    {% else %}
+                                    <div class="role-thumb-fallback"><i class="fas fa-box"></i></div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ order.product.display_name }}</strong>
+                                        <div class="small text-muted">{{ order.product.category.name|default:"Marketplace product" }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{% url 'public_profile' order.product.farmer.id %}" class="text-decoration-none">{{ order.product.farmer.username }}</a>
+                                {% with summary=ratings_by_user|get_item:order.product.farmer.id %}
+                                <div class="small text-muted"><i class="fas fa-star text-warning"></i> {{ summary.avg|default:"No ratings" }}</div>
+                                {% endwith %}
+                            </td>
+                            <td>
+                                {% if order.delivery.transporter %}
+                                <a href="{% url 'public_profile' order.delivery.transporter.id %}" class="text-decoration-none">{{ order.delivery.transporter.username }}</a>
+                                {% with summary=ratings_by_user|get_item:order.delivery.transporter.id %}
+                                <div class="small text-muted"><i class="fas fa-star text-warning"></i> {{ summary.avg|default:"No ratings" }}</div>
+                                {% endwith %}
+                                {% else %}
+                                <span class="text-muted">Not assigned yet</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.quantity }} {{ order.product.unit }}</td>
+                            <td><strong>DA {{ order.total_price }}</strong></td>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                <span class="status-badge status-pending">Pending</span>
+                                {% elif order.status == 'confirmed' %}
+                                <span class="status-badge status-confirmed">Confirmed</span>
+                                {% elif order.status == 'shipped' %}
+                                <span class="status-badge status-shipped">Shipped</span>
+                                {% elif order.status == 'delivered' %}
+                                <span class="status-badge status-delivered">Delivered</span>
+                                {% else %}
+                                <span class="status-badge status-cancelled">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ order.order_date|date:"M d, Y" }}</td>
+                            <td><small>{{ order.delivery_address|truncatechars:30 }}</small></td>
+                            <td>
+                                {% if order.status == 'delivered' %}
+                                <div class="role-rating-forms">
+                                    <form method="post" action="{% url 'rate_user' order.id order.product.farmer.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            <select name="score" class="form-select">
+                                                <option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+                                            </select>
+                                            <button class="btn btn-outline-warning" type="submit">Rate farmer</button>
+                                        </div>
+                                    </form>
+                                    {% if order.delivery.transporter %}
+                                    <form method="post" action="{% url 'rate_user' order.id order.delivery.transporter.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            <select name="score" class="form-select">
+                                                <option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+                                            </select>
+                                            <button class="btn btn-outline-warning" type="submit">Rate transporter</button>
+                                        </div>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <span class="text-muted small">Rating opens after delivery.</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="role-empty">
+            <i class="fas fa-shopping-bag"></i>
+            <h4>No orders yet</h4>
+            <p>Start shopping by browsing fresh products from farmers across the marketplace.</p>
+            <a href="{% url 'product_list' %}" class="btn btn-primary">Browse Products</a>
+        </div>
+        {% endif %}
+    </section>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,14 +1,130 @@
 {% extends 'marketplace/base.html' %}
+{% block page_title %}Update Delivery{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-image: url('/media/products/5789403159968026352_121.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+    .page-content {
+        background: transparent;
+    }
+    .update-delivery-page {
+        position: relative;
+        z-index: 1;
+    }
+    .update-delivery-page::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.24);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .update-delivery-page .card,
+    .update-delivery-page .bg-light,
+    .update-delivery-page .form-control {
+        background-color: rgba(255, 255, 255, 0.78) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.65);
+    }
+    .update-delivery-page .card {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+    }
+    .update-delivery-page .form-control {
+        border-color: rgba(34, 51, 27, 0.14);
+    }
+    .update-delivery-page .bg-light {
+        background-color: rgba(255, 255, 255, 0.55) !important;
+        border-color: rgba(255, 255, 255, 0.65) !important;
+    }
+    .update-delivery-page .btn.btn-success {
+        background-color: rgba(34, 101, 52, 0.16) !important;
+        color: #1e6b3a !important;
+        border-color: rgba(34, 101, 52, 0.35) !important;
+        box-shadow: none !important;
+    }
+    .update-delivery-page .btn.btn-success:hover {
+        background-color: rgba(34, 101, 52, 0.24) !important;
+        color: #163f23 !important;
+        border-color: rgba(34, 101, 52, 0.55) !important;
+    }
+    .update-delivery-page .btn.btn-outline-secondary {
+        background-color: rgba(34, 101, 52, 0.08) !important;
+        color: #1e6b3a !important;
+        border-color: rgba(34, 101, 52, 0.30) !important;
+    }
+    .update-delivery-page .btn.btn-outline-secondary:hover {
+        background-color: rgba(34, 101, 52, 0.14) !important;
+        color: #163f23 !important;
+        border-color: rgba(34, 101, 52, 0.55) !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Update Delivery #{{ delivery.id }}</h2>
-<p>Product: {{ delivery.order.product.name }}</p>
-<p>Buyer: {{ delivery.order.buyer.username }}</p>
-<p>Delivery address: {{ delivery.order.delivery_address }}</p>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">
-        {% if delivery.transporter_id %}Update Delivery{% else %}Claim and Update Delivery{% endif %}
-    </button>
-</form>
+<div class="row update-delivery-page">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body p-4">
+                <h4 class="mb-4"><i class="fas fa-truck text-success me-2"></i>Update Delivery #{{ delivery.id }}</h4>
+                
+                <div class="bg-light rounded p-3 mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong><i class="fas fa-box me-2"></i>Product:</strong> {{ delivery.order.product.name }}</p>
+                            <p class="mb-1"><strong><i class="fas fa-user me-2"></i>Buyer:</strong> {{ delivery.order.buyer.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong><i class="fas fa-map-marker-alt me-2"></i>Address:</strong> {{ delivery.order.delivery_address }}</p>
+                            <p class="mb-0"><strong><i class="fas fa-shopping-cart me-2"></i>Order:</strong> #{{ delivery.order.id }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Delivery Status</label>
+                            {{ form.delivery_status }}
+                            {% if form.delivery_status.errors %}
+                                <div class="text-danger small">{{ form.delivery_status.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estimated Delivery Date</label>
+                            {{ form.estimated_delivery_date }}
+                            {% if form.estimated_delivery_date.errors %}
+                                <div class="text-danger small">{{ form.estimated_delivery_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Actual Delivery Date</label>
+                            {{ form.actual_delivery_date }}
+                            {% if form.actual_delivery_date.errors %}
+                                <div class="text-danger small">{{ form.actual_delivery_date.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="fas fa-save me-2"></i>
+                            {% if delivery.transporter_id %}Update Delivery{% else %}Claim and Update{% endif %}
+                        </button>
+                        <a href="{% url 'transporter_dashboard' %}" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

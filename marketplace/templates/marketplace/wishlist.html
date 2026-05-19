@@ -1,0 +1,194 @@
+{% extends 'marketplace/base.html' %}
+{% block page_title %}My Wishlist{% endblock %}
+
+{% block extra_css %}
+<style>
+  .wishlist-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 20px;
+  }
+  .wishlist-panel,
+  .wishlist-side {
+    background: #fff;
+    border: 1px solid #e8ede8;
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(13, 31, 20, 0.05);
+  }
+  .wishlist-panel {
+    padding: 18px;
+  }
+  .wishlist-side {
+    padding: 18px;
+    height: fit-content;
+  }
+  .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .wish-card {
+    border: 1px solid #edf1ed;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .wish-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+  }
+  .wish-body {
+    padding: 14px;
+  }
+  .wish-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 999px;
+    color: white;
+    margin-bottom: 10px;
+  }
+  .badge-vegetables { background: #6cb35b; }
+  .badge-fruits { background: #ff9b3d; }
+  .badge-meat { background: #ff6b6b; }
+  .badge-other { background: #8b9aad; }
+  .wish-name {
+    display: block;
+    color: #17281b;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .wish-price {
+    color: #248245;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .wish-meta {
+    font-size: 0.76rem;
+    color: #7d8c7e;
+    margin-bottom: 4px;
+  }
+  .wish-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .wish-actions a,
+  .wish-actions button {
+    border-radius: 12px;
+    padding: 9px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .wish-summary {
+    display: grid;
+    gap: 14px;
+  }
+  .wish-stat {
+    padding: 14px;
+    border-radius: 14px;
+    background: #f8fbf8;
+    border: 1px solid #edf2ed;
+  }
+  .wish-stat .label {
+    font-size: 0.74rem;
+    color: #7c8d7d;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .wish-stat .value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #16261b;
+  }
+  @media (max-width: 1180px) {
+    .wishlist-shell {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 860px) {
+    .wishlist-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .wishlist-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-3">
+  <div>
+    <h3 class="page-title mb-1">My Wishlist</h3>
+    <p class="text-muted small mb-0">Saved products you may want to order later.</p>
+  </div>
+  <div>
+    <a href="{% url 'products_dashboard' %}" class="btn btn-outline"><i class="fas fa-arrow-left me-2"></i>Back to Products</a>
+  </div>
+</div>
+
+<div class="wishlist-shell">
+  <div class="wishlist-panel">
+    {% if items %}
+    <div class="wishlist-grid">
+      {% for item in items %}
+      <div class="wish-card">
+        <img src="{{ item.image_url }}" alt="{{ item.name }}">
+        <div class="wish-body">
+          <span class="wish-badge {{ item.category_badge_class }}">{{ item.category }}</span>
+          <a href="{% url 'product_detail' item.id %}" class="wish-name">{{ item.name }}</a>
+          <div class="wish-price">{{ item.price }} DA / {{ item.unit }}</div>
+          <div class="wish-meta">Stock: {{ item.stock }} {{ item.unit }}</div>
+          <div class="wish-meta">Seller: {{ item.farmer }}</div>
+          <div class="wish-meta">Farm: {{ item.farm }}</div>
+          <div class="wish-meta">Saved: {{ item.added_at|date:"M d, Y" }}</div>
+          <div class="wish-actions">
+            <a href="{% url 'product_detail' item.id %}" class="btn btn-outline">View</a>
+            <a href="{% url 'place_order' item.id %}" class="btn btn-primary">Order</a>
+            <form method="post" action="{% url 'remove_from_wishlist' item.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline" style="color:#ef4444;border-color:#ef4444;">Remove</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-heart"></i>
+      <h4>Your wishlist is empty</h4>
+      <p>Browse the products dashboard and save products you want to revisit.</p>
+      <a href="{% url 'products_dashboard' %}" class="btn btn-primary">Browse Products</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <aside class="wishlist-side">
+    <h5 class="mb-3" style="font-weight:800;">Wishlist Overview</h5>
+    <div class="wish-summary">
+      <div class="wish-stat">
+        <div class="label">Saved Products</div>
+        <div class="value">{{ items|length }}</div>
+      </div>
+      <div class="wish-stat">
+        <div class="label">Available to Order</div>
+        <div class="value">{{ available_to_order_count }}</div>
+      </div>
+      <div class="wish-stat">
+        <div class="label">Quick Action</div>
+        <a href="{% url 'products_dashboard' %}" class="btn btn-primary mt-2 w-100">Add More Products</a>
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

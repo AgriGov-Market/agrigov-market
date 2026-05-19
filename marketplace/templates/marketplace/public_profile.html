@@ -1,0 +1,168 @@
+{% extends 'marketplace/base.html' %}
+{% block page_title %}User Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+  .profile-view-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/media/products/5789403159968026335_121.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 48px 20px;
+  }
+  .profile-view-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.12);
+    z-index: 0;
+  }
+  .profile-view-background .profile-content-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .profile-view-background .card {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(255,255,255,0.24);
+    backdrop-filter: blur(10px);
+  }
+  .profile-view-background .card-header { background: rgba(255,255,255,0.72); }
+  .profile-view-background .card-body { background: transparent; }
+  .profile-view-background .text-start { background: rgba(255,255,255,0.6); }
+  .profile-view-background .table thead th,
+  .profile-view-background .table tbody td { background: rgba(255,255,255,0.72); }
+  .profile-view-background .table-hover tbody tr:hover { background: rgba(255,255,255,0.88); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-view-background">
+  <div class="profile-content-container">
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="mx-auto mb-3" style="width: 88px; height: 88px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700;">
+                    {{ viewed_user.username|first|upper }}
+                </div>
+                <h4 class="mb-1">{{ viewed_user.get_full_name|default:viewed_user.username }}</h4>
+                <p class="text-muted mb-2">{{ viewed_profile.get_user_type_display|default:"User" }}</p>
+                <div class="badge bg-warning text-dark p-2 mb-3">
+                    <i class="fas fa-star me-1"></i>
+                    {{ rating_summary.avg|default:"No ratings yet" }}{% if rating_summary.count %} / 5 from {{ rating_summary.count }} reviews{% endif %}
+                </div>
+                <div class="text-start bg-light rounded p-3">
+                    <p class="mb-2"><strong>Username:</strong> {{ viewed_user.username }}</p>
+                    <p class="mb-2"><strong>Role:</strong> {{ viewed_profile.get_user_type_display|default:"Not set" }}</p>
+                    <p class="mb-0"><strong>Public contact:</strong> {{ viewed_profile.phone|default:"Not provided" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        {% if viewed_profile.user_type == 'farmer' %}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-box text-success me-2"></i>Available Products</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if products %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>Product</th><th>Farm</th><th>Quantity</th><th>Price</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-outline-primary">{{ product.display_name }}</a>
+                                </td>
+                                <td>
+                                    {% if product.farm %}
+                                    <a href="{% url 'farm_detail' product.farm.id %}" class="btn btn-sm btn-outline-primary">{{ product.farm.name }}</a>
+                                    {% else %}
+                                    Not selected
+                                    {% endif %}
+                                </td>
+                                <td>{{ product.quantity }} {{ product.unit }}</td>
+                                <td>DA {{ product.price_per_unit }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-muted">No available products right now.</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-handshake text-success me-2"></i>Recent Completed Interactions</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if completed_orders %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>Order</th><th>Buyer</th><th>Farmer</th><th>Transporter</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for order in completed_orders %}
+                            <tr>
+                                <td>#{{ order.id }} - {{ order.product.display_name }}</td>
+                                <td>{{ order.buyer.username }}</td>
+                                <td>{{ order.product.farmer.username }}</td>
+                                <td>{{ order.delivery.transporter.username|default:"Not assigned" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-muted">No completed interactions yet.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-comments text-success me-2"></i>Recent Reviews</h5>
+            </div>
+            <div class="card-body">
+                {% if reviews %}
+                <div class="list-group">
+                    {% for review in reviews|slice:":5" %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ review.rater.username }}</strong>
+                                <div class="small text-muted">Order #{{ review.order.id }}</div>
+                            </div>
+                            <span class="badge bg-warning text-dark">{{ review.score }} / 5</span>
+                        </div>
+                        {% if review.comment %}
+                        <p class="mb-0 mt-2 text-muted">{{ review.comment }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted p-4">No recent reviews yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+  </div>
+</div>
+{% endblock %}

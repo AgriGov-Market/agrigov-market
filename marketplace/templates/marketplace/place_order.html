@@ -1,14 +1,148 @@
 {% extends 'marketplace/base.html' %}
+{% block page_title %}Place Order{% endblock %}
+
+{% block extra_css %}
+<style>
+    .place-order-bg {
+        min-height: calc(100vh - 120px);
+        background-image: url('/media/products/5789403159968026352_121.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        padding: 60px 0;
+    }
+    .product-preview-card {
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 16px;
+        padding: 18px;
+    }
+    .product-preview-card img,
+    .product-preview-card .badge,
+    .product-preview-card h5,
+    .product-preview-card p {
+        background: transparent;
+    }
+    .place-order-card {
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .place-order-card .card-body,
+    .place-order-card .form-control,
+    .place-order-card .alert,
+    .place-order-card .table {
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .place-order-card .table thead th,
+    .place-order-card .table tbody td,
+    .place-order-card .table tbody th {
+        background: transparent;
+    }
+
+    .place-order-card .form-control {
+        border-color: rgba(255, 255, 255, 0.35);
+        color: #111;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Place Order for {{ product.display_name }}</h2>
-{% if product.image %}
-<img src="{{ product.image.url }}" alt="{{ product.display_name }}" class="product-detail-image">
-{% endif %}
-<p>Available: {{ product.quantity }} {{ product.unit }}</p>
-<p>Price: DA {{ product.price_per_unit }}/{{ product.unit }}</p>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Confirm Order</button>
-</form>
+<div class="place-order-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card place-order-card border-0 shadow-sm" style="border-radius: 12px;">
+                    <div class="card-body p-4">
+                <h4 class="mb-4"><i class="fas fa-shopping-cart text-success me-2"></i>Place Order</h4>
+                
+                <div class="row g-4 mb-4 product-preview-card">
+                    <div class="col-md-4">
+                        {% if product.first_image_url %}
+                        <img src="{{ product.first_image_url }}" alt="{{ product.display_name }}" class="img-fluid rounded" style="object-fit: cover; height: 200px; width: 100%;">
+                        {% else %}
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h5>{{ product.display_name }}</h5>
+                        <p class="text-muted mb-2">{{ product.category.name }}</p>
+                        <div class="d-flex gap-3 mb-3">
+                            <span class="badge bg-success"><i class="fas fa-tag me-1"></i> DA {{ product.price_per_unit }}/{{ product.unit }}</span>
+                            <span class="badge bg-info"><i class="fas fa-box me-1"></i> Available: {{ product.quantity }} {{ product.unit }}</span>
+                        </div>
+                        <p class="text-muted small">{{ product.description|truncatewords:20 }}</p>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Quantity ({{ product.unit }})</label>
+                            {{ form.quantity }}
+                            {% if form.quantity.errors %}
+                                <div class="text-danger small">{{ form.quantity.errors }}</div>
+                            {% endif %}
+                            <div class="mt-2">
+                                <strong>Total:</strong> <span id="orderTotal">DA 0.00</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Delivery Address</label>
+                            {{ form.delivery_address }}
+                            {% if form.delivery_address.errors %}
+                                <div class="text-danger small">{{ form.delivery_address.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Enter the full delivery address: street, city, wilaya, and optionally postal code.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Order Summary:</strong> Your order will be sent to the farmer for confirmation. Once confirmed, a transporter will be assigned for delivery.
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="fas fa-check me-2"></i>Confirm Order
+                        </button>
+                        <a href="{% url 'product_list' %}" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Products
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+(function(){
+    const qtyInput = document.querySelector('#id_quantity') || document.querySelector('input[name="quantity"]');
+    const totalEl = document.getElementById('orderTotal');
+    const price = parseFloat('{{ product.price_per_unit|floatformat:2 }}');
+    function updateTotal(){
+        let q = parseFloat(qtyInput && qtyInput.value ? qtyInput.value : 0) || 0;
+        let total = q * price;
+        totalEl.textContent = 'DA ' + total.toFixed(2);
+    }
+    if(qtyInput){
+        qtyInput.addEventListener('input', updateTotal);
+        // initialize
+        updateTotal();
+    }
+})();
+</script>
+{% endblock %}
+
 {% endblock %}

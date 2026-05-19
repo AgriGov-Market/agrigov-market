@@ -1,11 +1,348 @@
 {% extends 'marketplace/base.html' %}
+{% block page_title %}Ministry Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-dashboard-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/media/products/connor-gan-l2LhqIQMo04-unsplash.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 48px 20px;
+  }
+  .admin-dashboard-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.12);
+    z-index: 0;
+  }
+  .admin-dashboard-background .role-dashboard {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .admin-dashboard-background .role-hero,
+  .admin-dashboard-background .role-section-card,
+  .admin-dashboard-background .role-stat-card,
+  .admin-dashboard-background .role-note-card,
+  .admin-dashboard-background .table {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(255,255,255,0.24);
+    backdrop-filter: blur(10px);
+  }
+  .admin-dashboard-background .role-hero {
+    padding: 32px;
+    border-radius: 18px;
+  }
+  .admin-dashboard-background .role-section-card,
+  .admin-dashboard-background .role-stat-card {
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .admin-dashboard-background .role-note-card,
+  .admin-dashboard-background .role-section-body,
+  .admin-dashboard-background .role-hero-copy,
+  .admin-dashboard-background .role-section-head {
+    background: transparent;
+  }
+  .admin-dashboard-background .role-hero-side .role-note-card {
+    background: rgba(255,255,255,0.82);
+  }
+  .admin-dashboard-background .role-hero .role-metrics,
+  .admin-dashboard-background .role-link-card,
+  .admin-dashboard-background .role-info-row,
+  .admin-dashboard-background .role-kpi-row,
+  .admin-dashboard-background .role-progress-item,
+  .admin-dashboard-background .table-responsive {
+    background: transparent;
+  }
+  .admin-dashboard-background .role-stat-card[data-tone="blue"] .role-stat-icon,
+  .admin-dashboard-background .role-stat-card[data-tone="rose"] .role-stat-icon {
+    background: rgba(0,0,0,0.08);
+  }
+  .admin-dashboard-background .role-section-card .role-section-head {
+    margin-bottom: 16px;
+  }
+  .admin-dashboard-background .table thead th,
+  .admin-dashboard-background .table tbody td {
+    background: rgba(255,255,255,0.72);
+  }
+  .admin-dashboard-background .table-hover tbody tr:hover {
+    background: rgba(255,255,255,0.88);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Admin Dashboard</h2>
-<div class="dashboard-stats">
-    <div class="card"><h3>{{ total_users }}</h3><p>Total Users</p></div>
-    <div class="card"><h3>{{ total_orders }}</h3><p>Total Orders</p></div>
-    <div class="card"><h3>{{ total_products }}</h3><p>Total Products</p></div>
+<div class="admin-dashboard-background">
+  <div class="role-dashboard">
+    <section class="role-hero">
+        <div class="role-hero-copy">
+            <span class="role-kicker"><i class="fas fa-landmark"></i> Ministry workspace</span>
+            <h1>Oversee the marketplace with one consistent operational view.</h1>
+            <p>Monitor participants, product activity, and official pricing from a single administration surface designed to match the public marketplace experience.</p>
+            <div class="role-actions">
+                <a href="{% url 'admin_user_list' %}" class="btn btn-primary"><i class="fas fa-users me-2"></i>User Management</a>
+                <a href="{% url 'official_prices' %}" class="btn btn-outline-primary"><i class="fas fa-tags me-2"></i>Official Prices</a>
+                <a href="{% url 'product_list' %}" class="btn btn-outline-primary"><i class="fas fa-box me-2"></i>View Products</a>
+            </div>
+            <div class="role-metrics">
+                <div class="role-metric">
+                    <strong>{{ total_users }}</strong>
+                    <span>Platform users</span>
+                </div>
+                <div class="role-metric">
+                    <strong>{{ total_orders }}</strong>
+                    <span>Orders processed</span>
+                </div>
+                <div class="role-metric">
+                    <strong>{{ price_records }}</strong>
+                    <span>Official price records</span>
+                </div>
+            </div>
+        </div>
+        <div class="role-hero-side">
+            <div class="role-note-card">
+                <h3>Administration snapshot</h3>
+                <p>Track adoption, keep price references current, and use one consistent operations theme across every user role.</p>
+                <div class="role-note-stack">
+                    <div class="role-note-line">
+                        <span>Admin rating</span>
+                        <strong>{{ my_rating.avg|default:"No ratings" }}{% if my_rating.count %} / 5{% endif %}</strong>
+                    </div>
+                    <div class="role-note-line">
+                        <span>Reviews received</span>
+                        <strong>{{ my_rating.count|default:"0" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="role-stats-grid">
+        <article class="role-stat-card" data-tone="blue">
+            <div class="role-stat-icon"><i class="fas fa-users"></i></div>
+            <div class="role-stat-copy">
+                <small>Total Users</small>
+                <strong>{{ total_users }}</strong>
+                <span>Registered accounts across all marketplace roles.</span>
+            </div>
+        </article>
+        <article class="role-stat-card">
+            <div class="role-stat-icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="role-stat-copy">
+                <small>Total Orders</small>
+                <strong>{{ total_orders }}</strong>
+                <span>Transactions created through the platform.</span>
+            </div>
+        </article>
+        <article class="role-stat-card" data-tone="rose">
+            <div class="role-stat-icon"><i class="fas fa-box"></i></div>
+            <div class="role-stat-copy">
+                <small>Total Products</small>
+                <strong>{{ total_products }}</strong>
+                <span>Listings currently registered in the marketplace.</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="role-dual-grid">
+        <article class="role-section-card">
+            <div class="role-section-head">
+                <div>
+                    <h2>Quick Actions</h2>
+                    <p>Jump into the most important ministry workflows.</p>
+                </div>
+            </div>
+            <div class="role-section-body">
+                <div class="role-link-grid">
+                    <a href="{% url 'admin_user_list' %}" class="role-link-card">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <strong>Manage Users</strong>
+                            <span>View and maintain registered accounts</span>
+                        </div>
+                    </a>
+                    <a href="{% url 'official_prices' %}" class="role-link-card">
+                        <i class="fas fa-scale-balanced"></i>
+                        <div>
+                            <strong>Update Prices</strong>
+                            <span>Maintain official market guidance</span>
+                        </div>
+                    </a>
+                    <a href="{% url 'product_list' %}" class="role-link-card">
+                        <i class="fas fa-boxes-stacked"></i>
+                        <div>
+                            <strong>Review Listings</strong>
+                            <span>Inspect public marketplace inventory</span>
+                        </div>
+                    </a>
+                    <a href="{% url 'admin_order_list' %}" class="role-link-card">
+                        <i class="fas fa-clipboard-list"></i>
+                        <div>
+                            <strong>Track Orders</strong>
+                            <span>Follow marketplace transaction flow</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </article>
+
+        <article class="role-section-card">
+            <div class="role-section-head">
+                <div>
+                    <h2>System Information</h2>
+                    <p>High-level operational context for the platform.</p>
+                </div>
+            </div>
+            <div class="role-section-body">
+                <div class="role-info-list">
+                    <div class="role-info-row">
+                        <span>Platform status</span>
+                        <strong><span class="badge bg-success">Active</span></strong>
+                    </div>
+                    <div class="role-info-row">
+                        <span>Database</span>
+                        <strong><span class="badge bg-info">SQLite</span></strong>
+                    </div>
+                    <div class="role-info-row">
+                        <span>Framework</span>
+                        <strong><span class="badge bg-secondary">Django</span></strong>
+                    </div>
+                    <div class="role-info-row">
+                        <span>Price records</span>
+                        <strong>{{ price_records }}</strong>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="role-dual-grid">
+        <article class="role-section-card">
+            <div class="role-section-head">
+                <div>
+                    <h2>Platform Overview</h2>
+                    <p>A compact read on the marketplace scale.</p>
+                </div>
+            </div>
+            <div class="role-section-body">
+                <div class="role-kpi-list">
+                    <div class="role-kpi-row">
+                        <span>Users</span>
+                        <strong>{{ total_users }}</strong>
+                    </div>
+                    <div class="role-kpi-row">
+                        <span>Products</span>
+                        <strong>{{ total_products }}</strong>
+                    </div>
+                    <div class="role-kpi-row">
+                        <span>Orders</span>
+                        <strong>{{ total_orders }}</strong>
+                    </div>
+                    <div class="role-kpi-row">
+                        <span>Price records</span>
+                        <strong>{{ price_records }}</strong>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="role-section-card">
+            <div class="role-section-head">
+                <div>
+                    <h2>User Distribution</h2>
+                    <p>Live role mix across the marketplace.</p>
+                </div>
+            </div>
+            <div class="role-section-body">
+                <div class="role-progress-list">
+                    {% for item in user_distribution %}
+                    <div class="role-progress-item">
+                        <label><span>{{ item.label }}</span><span>{{ item.count }} users - {{ item.percent }}%</span></label>
+                        <div class="role-progress-bar"><span style="width: {{ item.percent }}%;"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="role-section-card mt-4">
+        <div id="products" class="role-section-head">
+            <div>
+                <h2>Products Management</h2>
+                <p>Delete any product directly from the admin dashboard.</p>
+            </div>
+        </div>
+        <div class="role-section-body">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+                <form method="get" action="{% url 'admin_dashboard' %}#products" style="flex:1; display:flex; gap:8px;">
+                    <input type="text" name="search" placeholder="Search products by name" value="{{ search_query|default:'' }}" class="form-control" />
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    {% if search_query %}
+                    <a class="btn btn-outline-secondary" href="{% url 'admin_dashboard' %}">Clear</a>
+                    {% endif %}
+                </form>
+                
+            </div>
+            {% if products %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Farmer</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <strong>{{ product.display_name }}</strong>
+                                <div class="text-muted small">ID: {{ product.id }}</div>
+                            </td>
+                            <td>{{ product.farmer.username }}</td>
+                            <td>{{ product.category.name|default:"Uncategorized" }}</td>
+                            <td>{{ product.quantity }} {{ product.unit }}</td>
+                            <td>DA {{ product.price_per_unit }}</td>
+                            <td>
+                                {% if product.available %}
+                                <span class="badge bg-success-subtle text-success-emphasis">Available</span>
+                                {% else %}
+                                <span class="badge bg-danger-subtle text-danger-emphasis">Unavailable</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <form method="post" action="{% url 'admin_delete_product' product.id %}" onsubmit="return confirm('Delete {{ product.display_name }}?');" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <p class="text-muted">No products found.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+  </div>
 </div>
-<a href="{% url 'admin_user_list' %}" class="btn">View All Users</a>
-<a href="{% url 'official_prices' %}" class="btn">Manage Official Prices</a>
 {% endblock %}

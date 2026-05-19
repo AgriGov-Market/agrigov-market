@@ -1,9 +1,70 @@
 {% extends 'marketplace/base.html' %}
+{% block extra_css %}
+<style>
+    .users-background {
+        position: relative;
+        min-height: 100vh;
+        background-image: url('/media/products/connor-gan-l2LhqIQMo04-unsplash.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        padding: 48px 24px;
+    }
+    .users-background::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.12);
+        z-index: 0;
+    }
+    .users-background .users-container {
+        position: relative;
+        z-index: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        background: rgba(255,255,255,0.78);
+        border-radius: 12px;
+        padding: 24px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    .users-background table {
+        width: 100%;
+        border-collapse: collapse;
+        background: transparent;
+    }
+    .users-background thead th,
+    .users-background tbody td {
+        padding: 10px 12px;
+        background: rgba(255,255,255,0.62);
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .users-background thead th {
+        font-weight: 700;
+        color: #111;
+    }
+    .users-background .btn-danger { margin-left: 8px; }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>All Registered Users</h2>
-<table>
+<div class="users-background">
+    <div class="users-container">
+        <h2>All Registered Users</h2>
+        <form method="get" style="margin-bottom:12px; display:flex; gap:8px; align-items:center;">
+            <input type="text" name="q" placeholder="Search by username or name" value="{{ q|default:'' }}" style="flex:1; padding:8px; border-radius:6px; border:1px solid #ccc;" />
+            <button class="btn btn-primary" type="submit">Search</button>
+            {% if q %}
+            <a class="btn btn-outline-secondary" href="{% url 'admin_user_list' %}">Clear</a>
+            {% endif %}
+        </form>
+        {% if all_users %}
+        <div style="margin-bottom:8px; font-size:0.95rem; color:#333;">Showing {{ all_users|length }} user{{ all_users|length|pluralize }}</div>
+        {% endif %}
+        <table>
     <thead>
-        <tr><th>ID</th><th>Username</th><th>Email</th><th>Type</th><th>Capacity (kg)</th></tr>
+        <tr><th>ID</th><th>Username</th><th>Email</th><th>Type</th><th>Capacity (kg)</th><th>Status</th><th>Actions</th></tr>
     </thead>
     <tbody>
         {% for u in all_users %}
@@ -13,9 +74,21 @@
             <td>{{ u.email }}</td>
             <td>{% if u.userprofile %}{{ u.userprofile.user_type }}{% else %}-{% endif %}</td>
             <td>{% with t=u.transporterinfo %}{% if t %}{{ t.capacity_kg }}{% else %}-{% endif %}{% endwith %}</td>
+            <td>{% if u.is_active %}Active{% else %}Inactive{% endif %}</td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'admin_user_detail' u.id %}">Profile</a>
+                {% if u != request.user %}
+                <form method="post" action="{% url 'admin_delete_user' u.id %}" style="display:inline; margin-left:8px;" onsubmit="return confirm('Delete user {{ u.username }}? This cannot be undone.');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 <a href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
+    </div>
+</div>
 {% endblock %}

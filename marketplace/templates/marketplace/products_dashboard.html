@@ -1,0 +1,935 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+{% block page_title %}Products Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+  .products-dashboard-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/media/products/5789403159968026352_121.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding-top: 90px;
+    padding-bottom: 90px;
+    background-color: #fbfbfb;
+  }
+  .products-dashboard-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    z-index: 0;
+  }
+  .products-dashboard-background > * {
+    position: relative;
+    z-index: 1;
+  }
+  .products-layout,
+  .products-main,
+  .products-side,
+  .products-toolbar-card,
+  .products-panel,
+  .side-card,
+  .stat-screenshot {
+    position: relative;
+    z-index: 1;
+  }
+  .products-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 20px;
+  }
+  .products-main,
+  .products-side {
+    min-width: 0;
+  }
+  .products-toolbar-card,
+  .products-panel,
+  .side-card,
+  .stat-screenshot,
+  .shot-card {
+    background: rgba(255,255,255,0.70);
+    border: 1px solid rgba(226, 232, 227, 0.45);
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(13, 31, 20, 0.05);
+    backdrop-filter: blur(14px);
+  }
+  .shot-card {
+    min-width: 0;
+  }
+  .stats-screenshot-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .stat-screenshot {
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .stat-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .stat-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+  .stat-circle.total { background: #edf9ef; color: #228b4b; }
+  .stat-circle.crops { background: #fff3e8; color: #ff8b1f; }
+  .stat-circle.livestock { background: #f4edff; color: #9a63ff; }
+  .stat-circle.animal-products { background: #ffeaea; color: #ff6b6b; }
+  .stat-circle.vegetables { background: #fff3e8; color: #ff8b1f; }
+  .stat-circle.fruits { background: #f4edff; color: #9a63ff; }
+  .stat-circle.meat { background: #ffeaea; color: #ff6b6b; }
+  .stat-copy .label {
+    font-size: 0.74rem;
+    color: #7b8d7f;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .stat-copy .value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #15251a;
+    line-height: 1;
+  }
+  .stat-copy .sub {
+    font-size: 0.7rem;
+    color: var(--agri-primary);
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .stat-trend {
+    font-size: 1.8rem;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+  .stat-trend.green { color: #41b86a; }
+  .stat-trend.orange { color: #ff9a2f; }
+  .stat-trend.purple { color: #b078ff; }
+  .stat-trend.red { color: #ff7a7a; }
+
+  .products-toolbar-card {
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .toolbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pill-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pill-tab {
+    border: 1px solid #e6ece7;
+    background: #fff;
+    color: #607162;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .pill-tab.active {
+    background: var(--agri-primary);
+    color: #fff;
+    border-color: var(--agri-primary);
+  }
+  .pill-tab.veg i { color: #58a55c; }
+  .pill-tab.fruit i { color: #ff9654; }
+  .pill-tab.meat i { color: #ff7070; }
+  .pill-tab.active i { color: inherit; }
+  .toolbar-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .search-wrap,
+  .filter-wrap,
+  .sort-wrap {
+    position: relative;
+  }
+  .search-wrap input,
+  .filter-wrap button,
+  .sort-wrap select,
+  .ai-search-form input {
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 227, 0.8);
+    background: rgba(255,255,255,0.75);
+    font-size: 0.82rem;
+    min-height: 40px;
+  }
+  .search-wrap input {
+    min-width: 220px;
+    padding-left: 36px;
+  }
+  .ai-search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ai-search-form label {
+    font-size: 0.77rem;
+    color: #166534;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .ai-search-form input {
+    padding: 0 12px;
+    min-width: 180px;
+  }
+  .ai-search-form button {
+    min-width: 110px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 227, 0.8);
+    background: #fff;
+    color: #2d5233;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .ai-search-banner {
+    padding: 14px 18px;
+    background: #ecfdf5;
+    border: 1px solid #bbf7d0;
+    border-radius: 16px;
+    color: #166534;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .search-wrap i {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    color: #91a193;
+    font-size: 0.85rem;
+  }
+  .filter-wrap button {
+    color: #5a685b;
+    background: #fff;
+    padding: 0 14px;
+  }
+  .sort-wrap select {
+    min-width: 92px;
+    padding: 0 32px 0 12px;
+  }
+
+  .products-panel {
+    padding: 18px;
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #122217;
+    margin: 0;
+  }
+  .panel-meta {
+    font-size: 0.78rem;
+    color: #7c8d7d;
+    font-weight: 600;
+  }
+  .product-screenshot-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .shot-card {
+    border: 1px solid #edf1ed;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(13, 31, 20, 0.04);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .shot-media {
+    position: relative;
+    padding: 10px;
+  }
+  .shot-media img {
+    width: 100%;
+    height: 108px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+  }
+  .shot-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 999px;
+  }
+  .badge-vegetables { background: #6cb35b; }
+  .badge-fruits { background: #ff9b3d; }
+  .badge-meat { background: #ff6b6b; }
+  .badge-other { background: #8b9aad; }
+  .shot-body {
+    padding: 0 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .shot-name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #17281b;
+    text-decoration: none;
+    line-height: 1.2;
+  }
+  .shot-price {
+    font-size: 0.9rem;
+    color: var(--agri-primary);
+    font-weight: 800;
+  }
+  .shot-stock,
+  .shot-seller,
+  .shot-farm {
+    font-size: 0.72rem;
+    color: #7e8d80;
+  }
+  .shot-actions {
+    border-top: 1px solid #eff3ef;
+    margin-top: auto;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .icon-action,
+  .icon-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e8eee8;
+    background: #fff;
+    color: #748476;
+    text-decoration: none;
+    font-size: 0.78rem;
+  }
+  .icon-action-btn.remove {
+    color: #ef4444;
+  }
+  .icon-action-btn.order {
+    color: var(--agri-primary);
+  }
+  .icon-action-btn:hover,
+  .icon-action:hover {
+    border-color: #d8e3d8;
+    background: #f8fbf8;
+  }
+  .empty-products {
+    padding: 50px 16px;
+    text-align: center;
+    color: #819283;
+  }
+
+  .pagination-strip {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .page-chip {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e4eae4;
+    background: #fff;
+    color: #667667;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .page-chip.active {
+    background: var(--agri-primary);
+    color: #fff;
+    border-color: var(--agri-primary);
+  }
+
+  .side-card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .side-card h6 {
+    margin: 0 0 14px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #18281c;
+  }
+  .inventory-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .inventory-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+  }
+  .inventory-center strong {
+    display: block;
+    font-size: 1.6rem;
+    color: #132319;
+    line-height: 1;
+  }
+  .inventory-center span {
+    font-size: 0.72rem;
+    color: #7b8d7d;
+  }
+  .chart-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+  }
+  .inventory-list {
+    display: grid;
+    gap: 8px;
+  }
+  .inventory-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.76rem;
+    color: #607060;
+  }
+  .inventory-row strong {
+    color: #18281c;
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+  }
+  .seller-item,
+  .activity-item-shot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef2ee;
+  }
+  .seller-item:last-child,
+  .activity-item-shot:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .seller-item:first-child,
+  .activity-item-shot:first-child {
+    padding-top: 0;
+  }
+  .seller-thumb {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .seller-copy,
+  .activity-copy {
+    min-width: 0;
+    flex: 1;
+  }
+  .seller-copy strong,
+  .activity-copy strong {
+    display: block;
+    font-size: 0.78rem;
+    color: #1a281c;
+  }
+  .seller-link {
+    display: block;
+    font-size: 0.78rem;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .seller-copy span,
+  .activity-copy span {
+    display: block;
+    font-size: 0.7rem;
+    color: #819183;
+  }
+  .seller-metric {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--agri-primary);
+    white-space: nowrap;
+  }
+  .activity-icon-shot {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: #f4f8f4;
+    color: var(--agri-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-actions .btn {
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+  @media (max-width: 1350px) {
+    .product-screenshot-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 1180px) {
+    .products-layout {
+      grid-template-columns: 1fr;
+    }
+    .product-screenshot-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 860px) {
+    .stats-screenshot-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .product-screenshot-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .stats-screenshot-row,
+    .product-screenshot-grid {
+      grid-template-columns: 1fr;
+    }
+    .search-wrap input {
+      min-width: 100%;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="products-dashboard-background">
+<div class="role-dashboard">
+<section class="role-hero">
+  <div class="role-hero-copy">
+    <span class="role-kicker"><i class="fas fa-store"></i> Marketplace inventory</span>
+    <h1>Browse the live product catalog inside one consistent marketplace experience.</h1>
+    <p>Use visual AI search to discover products that match your uploaded image.</p>
+    <div class="role-actions">
+      {% if user.is_authenticated and user.userprofile.user_type == 'buyer' %}
+      <a href="{% url 'wishlist' %}" class="btn btn-outline-primary"><i class="fas fa-heart me-2"></i>Wishlist</a>
+      {% endif %}
+      {% if user.is_authenticated and user.userprofile.user_type == 'farmer' %}
+      <a href="{% url 'add_product' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Add New Product</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="role-hero-side">
+    <div class="role-note-card">
+      <h3>Catalog overview</h3>
+      <p>Filters, category tabs, product cards, and side insights now use the same shared theme as the rest of the platform.</p>
+      <div class="role-note-stack">
+        <div class="role-note-line">
+          <span>Visible products</span>
+          <strong>{{ stats.total_products }}</strong>
+        </div>
+        <div class="role-note-line">
+          <span>Crops & Produce listings</span>
+          <strong>{{ stats.crops }}</strong>
+        </div>
+        <div class="role-note-line">
+          <span>Livestock listings</span>
+          <strong>{{ stats.livestock }}</strong>
+        </div>
+        <div class="role-note-line">
+          <span>Animal product listings</span>
+          <strong>{{ stats.animal_products }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-screenshot-row">
+  <div class="stat-screenshot">
+    <div class="stat-left">
+      <div class="stat-circle total"><i class="fas fa-leaf"></i></div>
+      <div class="stat-copy">
+        <div class="label">Total Products</div>
+        <div class="value">{{ stats.total_products }}</div>
+        <div class="sub">+ 12.8% from last month</div>
+      </div>
+    </div>
+    <div class="stat-trend green">~</div>
+  </div>
+  <div class="stat-screenshot">
+    <div class="stat-left">
+      <div class="stat-circle crops"><i class="fas fa-seedling"></i></div>
+      <div class="stat-copy">
+        <div class="label">Crops & Produce</div>
+        <div class="value">{{ stats.crops }}</div>
+        <div class="sub">+ 8.3% from last month</div>
+      </div>
+    </div>
+    <div class="stat-trend orange">~</div>
+  </div>
+  <div class="stat-screenshot">
+    <div class="stat-left">
+      <div class="stat-circle livestock"><i class="fas fa-cow"></i></div>
+      <div class="stat-copy">
+        <div class="label">Livestock</div>
+        <div class="value">{{ stats.livestock }}</div>
+        <div class="sub">+ 15.7% from last month</div>
+      </div>
+    </div>
+    <div class="stat-trend purple">~</div>
+  </div>
+  <div class="stat-screenshot">
+    <div class="stat-left">
+      <div class="stat-circle animal-products"><i class="fas fa-egg"></i></div>
+      <div class="stat-copy">
+        <div class="label">Animal Products</div>
+        <div class="value">{{ stats.animal_products }}</div>
+        <div class="sub" style="color:#ef4444;">- 3.2% from last month</div>
+      </div>
+    </div>
+    <div class="stat-trend red">~</div>
+  </div>
+</div>
+
+<div class="products-layout">
+  <div class="products-main">
+    <form method="get" class="products-toolbar-card">
+      <div class="toolbar-row">
+        {% if not ai_message %}
+        <div class="pill-tabs">
+          <a href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if sort %}sort={{ sort|urlencode }}&{% endif %}" class="pill-tab {% if not active_category %}active{% endif %}">
+            All Products
+          </a>
+          <a href="?category=crops{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'crops' %}active{% endif %}">
+            🌾 Crops & Produce
+          </a>
+          <a href="?category=livestock{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'livestock' %}active{% endif %}">
+            🐄 Livestock
+          </a>
+          <a href="?category=animal_products{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'animal_products' %}active{% endif %}">
+            🥛 Animal Products
+          </a>
+          <a href="?category=seeds_plants{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'seeds_plants' %}active{% endif %}">
+            🌱 Seeds & Plants
+          </a>
+          <a href="?category=supplies{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'supplies' %}active{% endif %}">
+            🧪 Farming Supplies
+          </a>
+          <a href="?category=equipment{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'equipment' %}active{% endif %}">
+            🚜 Equipment & Tools
+          </a>
+          <a href="?category=animal_care{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'animal_care' %}active{% endif %}">
+            🐾 Animal Care
+          </a>
+          <a href="?category=services{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}" class="pill-tab {% if active_category == 'services' %}active{% endif %}">
+            🏡 Farm Services
+          </a>
+        </div>
+        {% endif %}
+        <div class="toolbar-actions">
+          {% if not ai_message %}
+          <div class="search-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" name="q" value="{{ q }}" placeholder="Search products...">
+          </div>
+          <input type="hidden" name="category" value="{{ active_category }}">
+          <div class="filter-wrap">
+            <button type="submit"><i class="fas fa-filter me-2"></i>Filter</button>
+          </div>
+          <div class="sort-wrap">
+            <select name="sort" onchange="this.form.submit()">
+              <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Sort by</option>
+              <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Low price</option>
+              <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>High price</option>
+            </select>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+    <style>
+      .ai-search-card { margin-bottom:18px; padding:12px; border-radius:10px; background:#f8f9fa; display:flex; align-items:center; justify-content:space-between; }
+      .ai-file-btn, .btn-visual-search{ display:inline-flex; align-items:center; gap:8px; color:#fff; background:#0f5132; border:none; padding:10px 14px; border-radius:999px; cursor:pointer; box-shadow:0 2px 6px rgba(16,24,32,0.08); font-weight:600; }
+      .ai-file-btn{ background:#0b3b29; }
+      .ai-file-btn:hover, .btn-visual-search:hover{ filter:brightness(0.95); }
+      .btn-visual-search{ background:#14532d; margin-left:auto; }
+      .image-preview{ width:80px; height:80px; border:1px solid #e6e6e6; display:none; align-items:center; justify-content:center; margin-left:12px; overflow:hidden; border-radius:8px; background:#fff; }
+      .image-preview img{ max-width:100%; max-height:100%; display:block; }
+      .file-name{ margin-left:8px; color:#0f172a; font-size:0.95rem; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .ai-search-label{ display:block; font-weight:600; margin-bottom:6px; }
+      .ai-controls{ display:flex; align-items:center; gap:10px; }
+    </style>
+
+    <form method="post" action="{% url 'ai_image_search' %}" enctype="multipart/form-data" class="products-toolbar-card ai-search-card">
+      {% csrf_token %}
+      <div class="toolbar-row" style="align-items:center;">
+        <div style="flex:1; display:flex; align-items:center; gap:12px;">
+          <div style="flex:1;">
+            <label class="ai-search-label">AI is here — try searching via Image — Find What You’re Looking For — Visually</label>
+            <div class="ai-controls">
+              <button id="ai_file_btn" class="ai-file-btn">Choose image</button>
+              <input id="ai_query_image" type="file" name="query_image" accept="image/*" required style="display:none;">
+              <span class="file-name" id="ai_file_name">No file chosen</span>
+              <div class="image-preview" id="ai_preview"><img src="" alt="Preview"></div>
+            </div>
+          </div>
+          <button type="submit" class="btn-visual-search">Visual Search</button>
+        </div>
+      </div>
+    </form>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function(){
+        var input = document.getElementById('ai_query_image');
+        var fileBtn = document.getElementById('ai_file_btn');
+        var fileName = document.getElementById('ai_file_name');
+        var preview = document.getElementById('ai_preview');
+        var previewImg = preview.querySelector('img');
+
+        if(fileBtn) fileBtn.addEventListener('click', function(e){ e.preventDefault(); input.click(); });
+
+        if(input) input.addEventListener('change', function(){
+          var file = this.files && this.files[0];
+          if (file){
+            fileName.textContent = file.name;
+            var reader = new FileReader();
+            reader.onload = function(e){ previewImg.src = e.target.result; preview.style.display = 'flex'; };
+            reader.readAsDataURL(file);
+          } else {
+            fileName.textContent = 'No file chosen';
+            preview.style.display = 'none';
+          }
+        });
+      });
+    </script>
+
+    <div class="products-panel">
+      {% if ai_message %}
+      <div class="ai-search-banner" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>{{ ai_message }}</span>
+        <a href="{% url 'products_dashboard' %}" class="btn btn-sm" style="background: #6c757d; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none;">← Back to All</a>
+      </div>
+      {% endif %}
+      <div class="panel-header">
+        <h4 class="panel-title">
+          {% if ai_message %}Visual Search Results{% else %}{{ active_category_label|default:'All Products' }} ({{ page_obj.paginator.count }}){% endif %}
+        </h4>
+        <div class="panel-meta">
+          {% if ai_message %}{{ page_obj.paginator.count }} results{% else %}Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}{% endif %}
+        </div>
+      </div>
+
+      {% if products %}
+      <div class="product-screenshot-grid">
+        {% for p in products %}
+        <div class="shot-card">
+          <div class="shot-media">
+            <img src="{{ p.image_url }}" alt="{{ p.name }}">
+            <span class="shot-badge {{ p.category_badge_class }}">{{ p.category }}</span>
+          </div>
+          <div class="shot-body">
+            <a href="{% url 'product_detail' p.id %}" class="shot-name">{{ p.name }}</a>
+            <div class="shot-price">{{ p.price }} DA / {{ p.unit }}</div>
+            <div class="shot-stock">Stock: {{ p.stock }} {{ p.unit }}</div>
+            <div class="shot-seller">Seller: {{ p.farmer }}</div>
+            <div class="shot-farm">
+              Farm: {% if p.farm_id %}
+                <a href="{% url 'farm_detail' p.farm_id %}" class="text-decoration-none">{{ p.farm }}</a>
+              {% else %}
+                {{ p.farm }}
+              {% endif %}
+            </div>
+          </div>
+          <div class="shot-actions">
+            <a href="{% url 'product_detail' p.id %}" class="icon-action" title="View"><i class="fas fa-eye"></i></a>
+            {% if user.is_authenticated and p.is_owner %}
+            <a href="{% url 'edit_product' p.id %}" class="icon-action" title="Edit"><i class="fas fa-pen"></i></a>
+            <form method="post" action="{% url 'delete_product' p.id %}" onsubmit="return confirm('Delete this product?');">
+              {% csrf_token %}
+              <button type="submit" class="icon-action-btn remove" title="Delete"><i class="fas fa-trash"></i></button>
+            </form>
+            {% elif p.can_order %}
+            <a href="{% url 'place_order' p.id %}" class="icon-action-btn order" title="Order"><i class="fas fa-shopping-cart"></i></a>
+            {% endif %}
+            {% if p.show_wishlist %}
+            <form method="post" action="{% url 'add_to_wishlist' p.id %}">
+              {% csrf_token %}
+              <button type="submit" class="icon-action-btn" title="Wishlist"><i class="fas fa-heart"></i></button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="pagination-strip">
+        {% if page_obj.has_previous %}
+        <a class="page-chip" href="?page={{ page_obj.previous_page_number }}{% if active_category %}&category={{ active_category|urlencode }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}"><i class="fas fa-chevron-left"></i></a>
+        {% endif %}
+        {% for page_num in page_obj.paginator.page_range %}
+          {% if page_num == page_obj.number %}
+          <span class="page-chip active">{{ page_num }}</span>
+          {% elif page_num >= page_obj.number|add:'-1' and page_num <= page_obj.number|add:'1' %}
+          <a class="page-chip" href="?page={{ page_num }}{% if active_category %}&category={{ active_category|urlencode }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}">{{ page_num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <a class="page-chip" href="?page={{ page_obj.next_page_number }}{% if active_category %}&category={{ active_category|urlencode }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}{% if sort %}&sort={{ sort|urlencode }}{% endif %}"><i class="fas fa-chevron-right"></i></a>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="empty-products">
+        <i class="fas fa-box-open fa-2x mb-3"></i>
+        <h5 class="mb-2">No products found</h5>
+        <p class="mb-0">Try a different search, category, or add products to the database.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <aside class="products-side">
+    <div class="side-card">
+      <h6>Inventory Overview</h6>
+      <div class="inventory-shell">
+        <div class="chart-wrap">
+          <canvas id="inventoryChart" width="180" height="180"></canvas>
+          <div class="inventory-center">
+            <strong>{{ inventory.total }}</strong>
+            <span>Total</span>
+          </div>
+        </div>
+      </div>
+      <div class="inventory-list">
+        {% for b in inventory.breakdown %}
+        <div class="inventory-row">
+          <div><span class="dot" style="background: {{ b.color }};"></span>{{ b.label }}</div>
+          <div><strong>{{ b.count }}</strong> ({{ b.percent }}%)</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">Top Selling Products</h6>
+        <span class="panel-meta">This Month</span>
+      </div>
+      {% for s in top_sellers %}
+      <div class="seller-item">
+        <img src="{{ s.image_url }}" alt="{{ s.name }}" class="seller-thumb">
+        <div class="seller-copy">
+          <a href="{% url 'product_detail' s.id %}" class="seller-link">{{ s.name }}</a>
+          <span>{{ s.category }}</span>
+        </div>
+        <div class="seller-metric">{{ s.stock }} {{ s.unit }}</div>
+      </div>
+      {% empty %}
+      <div class="small text-muted">No products available yet.</div>
+      {% endfor %}
+    </div>
+
+    <div class="side-card">
+      <h6>Recent Activity</h6>
+      {% for a in recent_activity %}
+      <div class="activity-item-shot">
+        <div class="activity-icon-shot"><i class="fas {{ a.icon_class }}"></i></div>
+        <div class="activity-copy">
+          <strong>{{ a.message }}</strong>
+          <span>{{ a.time }}</span>
+        </div>
+      </div>
+      {% empty %}
+      <div class="small text-muted">No recent activity.</div>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const inventoryChart = document.getElementById('inventoryChart');
+  if (inventoryChart) {
+    new Chart(inventoryChart.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: [{% for b in inventory.breakdown %}'{{ b.label }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+          data: [{% for b in inventory.breakdown %}{{ b.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+          backgroundColor: [{% for b in inventory.breakdown %}'{{ b.color }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+          borderWidth: 0,
+          hoverOffset: 4,
+        }]
+      },
+      options: {
+        cutout: '72%',
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+</script>
+{% endblock %}

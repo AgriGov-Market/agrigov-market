@@ -1,47 +1,494 @@
 {% extends 'marketplace/base.html' %}
-{% block content %}
-<section class="hero">
-    <div class="hero-copy">
-        <p class="eyebrow">Digital agriculture marketplace</p>
-        <h1>Move crops from farm to buyer with less friction.</h1>
-        <p class="hero-lead">
-            AgriGov Market helps farmers list produce, buyers place orders, and transporters
-            coordinate delivery in one simple workflow.
-        </p>
-        <div class="hero-actions">
-            {% if user.is_authenticated %}
-                <a href="{% url 'dashboard' %}" class="btn">Open Dashboard</a>
-            {% else %}
-                <a href="{% url 'register' %}" class="btn">Create Account</a>
-                <a href="{% url 'product_list' %}" class="btn btn-outline">Browse Produce</a>
-            {% endif %}
-        </div>
-    </div>
-    <div class="hero-panel">
-        <div class="hero-badge">Trusted flow</div>
-        <div class="hero-stat">
-            <span class="hero-stat-number">3 roles</span>
-            <span class="hero-stat-label">Farmers, buyers, transporters</span>
-        </div>
-        <div class="hero-stat">
-            <span class="hero-stat-number">1 platform</span>
-            <span class="hero-stat-label">Products, orders, prices, delivery</span>
-        </div>
-    </div>
-</section>
+{% load static %}
 
-<section class="feature-strip">
-    <article class="feature-card">
-        <h3>For Farmers</h3>
-        <p>Create farms, publish products, and track incoming orders from one dashboard.</p>
-    </article>
-    <article class="feature-card">
-        <h3>For Buyers</h3>
-        <p>Browse available produce, compare pricing, and place orders quickly.</p>
-    </article>
-    <article class="feature-card">
-        <h3>For Transporters</h3>
-        <p>Claim deliveries, update shipment status, and keep orders moving.</p>
-    </article>
-</section>
+{% block title %}AgriGov Market - Agricultural Trade Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .agrigov-hero {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .agrigov-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 38%, rgba(255, 255, 255, 0.28) 100%),
+            url("/media/products/pexels-jan-van-der-wolf-11680885-16945221.jpg") center/cover no-repeat;
+        opacity: 0.62;
+        filter: blur(2px);
+        transform: scale(1.03);
+        pointer-events: none;
+    }
+
+    .agrigov-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .agrigov-hero-visual {
+        min-height: 520px;
+    }
+
+    .agrigov-hero-image-wrap {
+        background:
+            linear-gradient(135deg, rgba(18, 67, 54, 0.12), rgba(255, 255, 255, 0.04)),
+            url("/media/products/pexels-jan-van-der-wolf-11680885-16945221.jpg") center/cover no-repeat;
+    }
+
+    .agrigov-hero-image-wrap img {
+        display: block;
+    }
+
+    @media (min-width: 992px) {
+        .agrigov-hero-grid {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) minmax(540px, 1fr) !important;
+            align-items: center !important;
+            gap: 54px !important;
+        }
+
+        .agrigov-hero-copy,
+        .agrigov-hero-media {
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        .agrigov-hero-media {
+            min-width: 0 !important;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .agrigov-hero-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block public_nav %}
+<nav class="navbar navbar-expand-lg agrigov-navbar">
+    <div class="container agrigov-nav-inner">
+        <a class="navbar-brand agrigov-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+            <img src="/media/products/logow.png" alt="AgriGov Market" style="width:40px; height:auto; display:block;">
+            <span>AgriGov Market</span>
+        </a>
+        <button class="navbar-toggler agrigov-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#agrigovHomeNav" aria-controls="agrigovHomeNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="agrigovHomeNav">
+            <ul class="navbar-nav mx-auto agrigov-nav-links">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'product_list' %}">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="#prices">Prices</a></li>
+                <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
+                <li class="nav-item"><a class="nav-link" href="#why-choose-us">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+            </ul>
+            <div class="agrigov-nav-actions">
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn agrigov-btn agrigov-btn-ghost">Dashboard</a>
+                <a href="{% url 'logout' %}" class="btn agrigov-btn agrigov-btn-solid">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn agrigov-btn agrigov-btn-ghost">Login</a>
+                <a href="{% url 'register' %}" class="btn agrigov-btn agrigov-btn-solid">Create Account</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="agrigov-homepage">
+    <section class="agrigov-hero">
+        <div class="container">
+            <div class="agrigov-hero-grid">
+                <div class="agrigov-hero-copy">
+                    <div class="agrigov-eyebrow">
+                        <i class="fas fa-shield-heart"></i>
+                        <span>Ministry-Supported Platform</span>
+                    </div>
+                    <h1>AgriGov <span>Market</span></h1>
+                    <h2 class="agrigov-hero-subtitle">Connecting Farmers, Buyers &amp; Transporters in One Smart Platform</h2>
+                    <p>A practical platform where farmers publish produce, buyers place orders, transporters coordinate deliveries, and official prices keep the market transparent.</p>
+                    <div class="agrigov-hero-actions">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn agrigov-btn agrigov-btn-solid">Open Dashboard <i class="fas fa-arrow-right"></i></a>
+                        {% else %}
+                        <a href="{% url 'register' %}" class="btn agrigov-btn agrigov-btn-solid">Get Started <i class="fas fa-arrow-right"></i></a>
+                        {% endif %}
+                        <a href="{% url 'product_list' %}" class="btn agrigov-btn agrigov-btn-light"><i class="fas fa-basket-shopping"></i> Browse Products</a>
+                    </div>
+                    <div class="agrigov-hero-note">
+                        <i class="fas fa-circle-check"></i>
+                        <span>{{ products_count }} live products and {{ prices_count }} official price records available</span>
+                    </div>
+                </div>
+
+                <div class="agrigov-hero-media">
+                    <div class="agrigov-hero-visual">
+                        <div class="agrigov-hero-image-wrap">
+                            <div class="agrigov-hero-gradient"></div>
+                            <img src="/media/products/logo2.jpg" alt="AgriGov Market Logo">
+                        </div>
+                        <div class="agrigov-floating-card agrigov-card-top">
+                            <span class="agrigov-floating-label">Live Orders</span>
+                            <strong>{{ orders_count }}</strong>
+                            <small>Marketplace transactions</small>
+                        </div>
+                        <div class="agrigov-floating-card agrigov-card-middle">
+                            <span class="agrigov-floating-label">Official Prices</span>
+                            <strong>{{ prices_count }}</strong>
+                            <small>Updated daily</small>
+                        </div>
+                        <div class="agrigov-floating-card agrigov-card-bottom">
+                            <div>
+                                <i class="fas fa-tractor"></i>
+                                <span>Farmers<br><small>{{ farmers_count }}+</small></span>
+                            </div>
+                            <div>
+                                <i class="fas fa-cart-shopping"></i>
+                                <span>Orders<br><small>{{ orders_count }}+</small></span>
+                            </div>
+                            <div>
+                                <i class="fas fa-truck"></i>
+                                <span>Transporters<br><small>{{ transporters_count }}+</small></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-stats-section">
+        <div class="container">
+            <div class="agrigov-stats-grid">
+                <div class="agrigov-stat-item">
+                    <div class="agrigov-stat-icon"><i class="fas fa-users"></i></div>
+                    <div>
+                        <strong>{{ farmers_count }}+</strong>
+                        <span>Registered Farmers</span>
+                    </div>
+                </div>
+                <div class="agrigov-stat-item">
+                    <div class="agrigov-stat-icon"><i class="fas fa-bag-shopping"></i></div>
+                    <div>
+                        <strong>{{ orders_count }}+</strong>
+                        <span>Orders Delivered</span>
+                    </div>
+                </div>
+                <div class="agrigov-stat-item">
+                    <div class="agrigov-stat-icon"><i class="fas fa-truck-fast"></i></div>
+                    <div>
+                        <strong>{{ transporters_count }}+</strong>
+                        <span>Active Transporters</span>
+                    </div>
+                </div>
+                <div class="agrigov-stat-item">
+                    <div class="agrigov-stat-icon"><i class="fas fa-star"></i></div>
+                    <div>
+                        <strong>{{ trust_score }}/5</strong>
+                        <span>Trusted Experience</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-section agrigov-section-muted">
+        <div class="container">
+            <div class="agrigov-section-heading">
+                <span>What We Do</span>
+                <h2>Everything You Need in One Place</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <article class="agrigov-feature-card">
+                        <div class="agrigov-feature-icon"><i class="fas fa-seedling"></i></div>
+                        <h3>Connect Farmers</h3>
+                        <p>Farmers list products, follow official prices, view buyer contacts, and track assigned transporters.</p>
+                        <a href="{% url 'product_list' %}" class="agrigov-inline-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="agrigov-feature-card">
+                        <div class="agrigov-feature-icon agrigov-feature-icon-blue"><i class="fas fa-cart-shopping"></i></div>
+                        <h3>Serve Buyers</h3>
+                        <p>Buyers browse available products, place orders, and track shipment progress with less friction.</p>
+                        <a href="{% url 'product_list' %}" class="agrigov-inline-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </article>
+                </div>
+                <div class="col-md-4">
+                    <article class="agrigov-feature-card">
+                        <div class="agrigov-feature-icon agrigov-feature-icon-amber"><i class="fas fa-truck"></i></div>
+                        <h3>Move Deliveries</h3>
+                        <p>Transporters claim delivery missions, update shipment status, and build trust through completed order ratings.</p>
+                        <a href="{% url 'product_list' %}" class="agrigov-inline-link">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-section agrigov-section-soft" id="how-it-works">
+        <div class="container">
+            <div class="agrigov-section-heading">
+                <span>How It Works</span>
+                <h2>Simple Steps, Strong Connections</h2>
+            </div>
+            <div class="agrigov-steps-grid">
+                <article class="agrigov-step-card">
+                    <div class="agrigov-step-number">1</div>
+                    <div class="agrigov-step-icon"><i class="fas fa-basket-shopping"></i></div>
+                    <h3>Farmer Adds Product</h3>
+                    <p>Farmers publish listings with stock, pricing, and farm details.</p>
+                </article>
+                <article class="agrigov-step-card">
+                    <div class="agrigov-step-number">2</div>
+                    <div class="agrigov-step-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>Buyer Places Order</h3>
+                    <p>Buyers compare products, prices, and locations before ordering.</p>
+                </article>
+                <article class="agrigov-step-card">
+                    <div class="agrigov-step-number">3</div>
+                    <div class="agrigov-step-icon"><i class="fas fa-truck-fast"></i></div>
+                    <h3>Transporter Delivers</h3>
+                    <p>Transporters accept missions and keep delivery progress visible.</p>
+                </article>
+                <article class="agrigov-step-card">
+                    <div class="agrigov-step-number">4</div>
+                    <div class="agrigov-step-icon"><i class="fas fa-money-check-dollar"></i></div>
+                    <h3>Payment &amp; Rating</h3>
+                    <p>Orders close with transparent payment flow and stronger trust signals.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-section" id="products">
+        <div class="container">
+            <div class="agrigov-section-heading agrigov-section-heading-inline">
+                <div>
+                    <span>Products Preview</span>
+                    <h2>Fresh Products from Our Farmers</h2>
+                </div>
+                <a href="{% url 'product_list' %}" class="agrigov-text-link">View all products <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="agrigov-products-grid">
+                {% for product in featured_products %}
+                <article class="agrigov-product-card">
+                    <a href="{% url 'product_detail' product.id %}" class="agrigov-product-link text-decoration-none text-dark">
+                        <div class="agrigov-product-image">
+                            {% if product.image_url %}
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                            {% else %}
+                            <img src="{% static 'marketplace/glenn-carstens-peters-2E_dT65fyxo-unsplash.jpg' %}" alt="{{ product.name }}">
+                            {% endif %}
+                        </div>
+                        <div class="agrigov-product-body">
+                            <div class="agrigov-product-meta">{{ product.category }}</div>
+                            <h3>{{ product.name }}</h3>
+                            <div class="agrigov-product-price">{{ product.price|floatformat:0 }} DA <span>/ {{ product.unit }}</span></div>
+                            <div class="agrigov-product-location"><i class="fas fa-location-dot"></i> {{ product.location }}</div>
+                        </div>
+                    </a>
+                </article>
+                {% empty %}
+                <div class="agrigov-empty-card">
+                    <i class="fas fa-basket-shopping"></i>
+                    <h3>No products yet</h3>
+                    <p>Add products from the farmer dashboard to populate this section.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-section agrigov-section-muted agrigov-prices-section" id="prices">
+        <div class="container">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-4">
+                    <div class="agrigov-prices-intro">
+                        <span class="agrigov-badge">Updated Daily</span>
+                        <h2>Official Market Prices</h2>
+                        <p>Reference pricing helps farmers stay competitive and gives buyers a clear market baseline.</p>
+                        {% if latest_price_update %}
+                        <div class="agrigov-price-update">Last synced: {{ latest_price_update|date:"M d, Y" }}</div>
+                        {% endif %}
+                        <a href="{% url 'official_prices' %}" class="btn agrigov-btn agrigov-btn-solid">See All Prices</a>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="agrigov-table-card">
+                        <div class="table-responsive">
+                            <table class="table agrigov-price-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Unit</th>
+                                        <th>Price</th>
+                                        <th>Effective Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for price in latest_prices %}
+                                    <tr>
+                                        <td>{{ price.commodity }}</td>
+                                        <td>/ {{ price.unit }}</td>
+                                        <td>{{ price.price|floatformat:0 }} DA</td>
+                                        <td>{{ price.effective_date|date:"M d, Y" }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted">No official prices available yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-section" id="why-choose-us">
+        <div class="container">
+            <div class="agrigov-section-heading">
+                <span>Why Choose Us</span>
+                <h2>Why Choose AgriGov Market?</h2>
+            </div>
+            <div class="agrigov-advantages-grid">
+                <article class="agrigov-advantage-card">
+                    <i class="fas fa-landmark"></i>
+                    <h3>Government Supported</h3>
+                    <p>Built to encourage transparent agricultural trade and stronger market access.</p>
+                </article>
+                <article class="agrigov-advantage-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Transparent Pricing</h3>
+                    <p>Official market price references make negotiations faster and more informed.</p>
+                </article>
+                <article class="agrigov-advantage-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Secure Workflows</h3>
+                    <p>Role-based dashboards keep orders, delivery progress, and participants organized.</p>
+                </article>
+                <article class="agrigov-advantage-card">
+                    <i class="fas fa-route"></i>
+                    <h3>Real-Time Logistics</h3>
+                    <p>Transport coordination stays visible from order confirmation to delivery completion.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-section agrigov-section-soft agrigov-testimonials-section">
+        <div class="container">
+            <div class="agrigov-section-heading">
+                <span>Testimonials</span>
+                <h2>What Our Users Say</h2>
+            </div>
+            <div class="row g-4 agrigov-testimonials-row">
+                {% for testimonial in testimonials %}
+                <div class="col-lg-4 col-md-6">
+                    <article class="agrigov-testimonial-card">
+                        <div class="agrigov-testimonial-top">
+                            <div class="agrigov-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="agrigov-quote-icon"><i class="fas fa-quote-right"></i></div>
+                        </div>
+                        <p class="agrigov-testimonial-copy">"{{ testimonial.comment }}"</p>
+                        <div class="agrigov-reviewer">
+                            <div class="agrigov-avatar">{{ testimonial.initial }}</div>
+                            <div class="agrigov-reviewer-meta">
+                                <strong>{{ testimonial.name }}</strong>
+                                <span>{{ testimonial.role }}</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="agrigov-section">
+        <div class="container">
+            <div class="agrigov-cta-card">
+                <div class="agrigov-cta-content">
+                    <span>Ready to join?</span>
+                    <h2>Start Using AgriGov Market Today</h2>
+                    <p>Create your account to list produce, place orders, or manage deliveries from one modern marketplace.</p>
+                </div>
+                <div class="agrigov-cta-actions">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="btn agrigov-btn agrigov-btn-light">Open Dashboard</a>
+                    <a href="{% url 'product_list' %}" class="btn agrigov-btn agrigov-btn-ghost-light">Browse Products</a>
+                    {% else %}
+                    <a href="{% url 'register' %}" class="btn agrigov-btn agrigov-btn-light">Create Account</a>
+                    <a href="{% url 'login' %}" class="btn agrigov-btn agrigov-btn-ghost-light">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="agrigov-footer" id="contact">
+        <div class="container">
+            <div class="row g-4 agrigov-footer-grid">
+                <div class="col-lg-4 col-md-6 agrigov-footer-col">
+                    <a class="agrigov-brand agrigov-footer-brand" href="{% url 'home' %}">
+                        <i class="fas fa-leaf"></i>
+                        <span>AgriGov Market</span>
+                    </a>
+                    <p>A ministry-supported platform building a transparent, efficient, and trusted agricultural marketplace.</p>
+                    <div class="agrigov-socials">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-2 agrigov-footer-col">
+                    <h3>Links</h3>
+                    <a href="{% url 'home' %}">Home</a>
+                    <a href="{% url 'product_list' %}">Products</a>
+                    <a href="#prices">Prices</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#why-choose-us">About Us</a>
+                </div>
+                <div class="col-sm-6 col-lg-3 agrigov-footer-col">
+                    <h3>Platform</h3>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                    {% else %}
+                    <a href="{% url 'register' %}">Create Account</a>
+                    <a href="{% url 'login' %}">Login</a>
+                    {% endif %}
+                    <a href="{% url 'official_prices' %}">Official Prices</a>
+                    <a href="{% url 'product_list' %}">Browse Products</a>
+                </div>
+                <div class="col-lg-3 col-md-6 agrigov-footer-col">
+                    <h3>Contact</h3>
+                    <p><i class="fas fa-building-columns"></i> Ministry of Agriculture, Algiers</p>
+                    <p><i class="fas fa-envelope"></i> support@agrigovmarket.dz</p>
+                    <p><i class="fas fa-phone"></i> +213 555 23 45 67</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
 {% endblock %}

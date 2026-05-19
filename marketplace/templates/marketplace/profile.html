@@ -1,0 +1,125 @@
+{% extends 'marketplace/base.html' %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-background {
+        position: relative;
+        min-height: 100vh;
+        background-image: url('/media/products/5789403159968026335_121.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        padding: 48px 20px;
+    }
+    .profile-background::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.12);
+        z-index: 0;
+    }
+    .profile-background .profile-container {
+        position: relative;
+        z-index: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .profile-background .card {
+        background: rgba(255,255,255,0.78);
+        border-color: rgba(255,255,255,0.22);
+        backdrop-filter: blur(10px);
+    }
+    .profile-background .text-start {
+        background: rgba(255,255,255,0.6);
+        padding: 12px;
+        border-radius: 8px;
+    }
+    .profile-background .card-header { background: rgba(255,255,255,0.72); }
+    .profile-background .card-body { background: transparent; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-background">
+    <div class="profile-container">
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="mx-auto mb-3" style="width: 88px; height: 88px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700;">
+                    {{ user.username|first|upper }}
+                </div>
+                <h4 class="mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-muted mb-3">{{ profile_obj.get_user_type_display }}</p>
+                <div class="mb-3">
+                    <span class="badge bg-warning text-dark p-2">
+                        <i class="fas fa-star me-1"></i>
+                        {{ rating_summary.avg|default:"No ratings yet" }}{% if rating_summary.count %} / 5 from {{ rating_summary.count }} reviews{% endif %}
+                    </span>
+                </div>
+                <div class="text-start bg-light rounded p-3">
+                    <p class="mb-2"><strong>Username:</strong> {{ user.username }}</p>
+                    <p class="mb-2"><strong>Email:</strong> {{ user.email|default:"Not provided" }}</p>
+                    <p class="mb-2"><strong>Phone:</strong> {{ profile_obj.phone|default:"Not provided" }}</p>
+                    <p class="mb-0"><strong>Address:</strong> {{ profile_obj.address|default:"Not provided" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="fas fa-user-circle text-success me-2"></i>Profile Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        {% for field in account_form %}
+                        <div class="col-md-6">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+
+                        {% for field in profile_form %}
+                        <div class="col-md-6">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+
+                        {% if transporter_form %}
+                        <div class="col-12"><hr><h6>Transporter Details</h6></div>
+                        {% for field in transporter_form %}
+                        <div class="col-md-6">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Profile
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+{% endblock %}

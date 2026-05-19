@@ -1,65 +1,371 @@
 {% extends 'marketplace/base.html' %}
+{% load custom_filters %}
+{% block page_title %}Farmer Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+  .farmer-page-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/media/products/5789403159968026335_121.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 48px 20px;
+  }
+  .farmer-page-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.12);
+    z-index: 0;
+  }
+  .farmer-page-background .farmer-content-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .farmer-page-background .role-hero,
+  .farmer-page-background .role-section-card,
+  .farmer-page-background .role-stat-card,
+  .farmer-page-background .role-note-card,
+  .farmer-page-background .table {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(255,255,255,0.24);
+    backdrop-filter: blur(10px);
+  }
+  .farmer-page-background .role-hero { padding: 32px; border-radius: 18px; }
+  .farmer-page-background .role-section-card,
+  .farmer-page-background .role-stat-card { border-radius: 18px; overflow: hidden; }
+  .farmer-page-background .role-hero-side .role-note-card { background: rgba(255,255,255,0.82); }
+  .farmer-page-background .role-section-body,
+  .farmer-page-background .role-hero-copy,
+  .farmer-page-background .role-section-head,
+  .farmer-page-background .role-metrics,
+  .farmer-page-background .role-table-wrap,
+  .farmer-page-background .role-mini-grid,
+  .farmer-page-background .role-empty { background: transparent; }
+  .farmer-page-background .table thead th,
+  .farmer-page-background .table tbody td { background: rgba(255,255,255,0.72); }
+  .farmer-page-background .table-hover tbody tr:hover { background: rgba(255,255,255,0.88); }
+  .farmer-page-background .role-empty { color: #111; }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Farmer Dashboard</h2>
-<a href="{% url 'add_farm' %}" class="btn">Add Farm</a>
-<a href="{% url 'add_product' %}" class="btn">Add Product</a>
+<div class="farmer-page-background">
+  <div class="farmer-content-container">
+<div class="role-dashboard">
+    <section class="role-hero">
+        <div class="role-hero-copy">
+            <span class="role-kicker"><i class="fas fa-seedling"></i> Farmer workspace</span>
+            <h1>Manage produce, farms, and buyer demand in one place.</h1>
+            <p>Keep products updated, monitor incoming orders, and stay aligned with market activity through one consistent AgriGov dashboard.</p>
+            <div class="role-actions">
+                <a href="{% url 'add_product' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Add Product</a>
+                <a href="{% url 'add_farm' %}" class="btn btn-outline-primary"><i class="fas fa-seedling me-2"></i>Add Farm</a>
+            </div>
+            <div class="role-metrics">
+                <div class="role-metric">
+                    <strong>{{ products|length }}</strong>
+                    <span>Live product listings</span>
+                </div>
+                <div class="role-metric">
+                    <strong>{{ orders|length }}</strong>
+                    <span>Total buyer orders</span>
+                </div>
+                <div class="role-metric">
+                    <strong>{{ farms|length }}</strong>
+                    <span>Registered farms</span>
+                </div>
+            </div>
+        </div>
+        <div class="role-hero-side">
+            <div class="role-note-card">
+                <h3>Performance snapshot</h3>
+                <p>Your workspace is organized around products, farm locations, and order handling so buyers can transact faster.</p>
+                <div class="role-note-stack">
+                    <div class="role-note-line">
+                        <span>Farmer rating</span>
+                        <strong>{{ my_rating.avg|default:"No ratings" }}{% if my_rating.count %} / 5{% endif %}</strong>
+                    </div>
+                    <div class="role-note-line">
+                        <span>Reviews received</span>
+                        <strong>{{ my_rating.count|default:"0" }}</strong>
+                    </div>
+                    <div class="role-note-line">
+                        <span>Confirmed orders</span>
+                        <strong>{{ confirmed_orders_count }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<h3>My Farms</h3>
-<ul>
-    {% for farm in farms %}
-        <li>{{ farm.name }} ({{ farm.location }}) - {{ farm.size_acres }} acres</li>
-    {% empty %}
-        <li>No farms yet.</li>
-    {% endfor %}
-</ul>
+    <section class="role-stats-grid">
+        <article class="role-stat-card">
+            <div class="role-stat-icon"><i class="fas fa-box"></i></div>
+            <div class="role-stat-copy">
+                <small>Total Products</small>
+                <strong>{{ products|length }}</strong>
+                <span>Active listings available to buyers.</span>
+            </div>
+        </article>
+        <article class="role-stat-card" data-tone="blue">
+            <div class="role-stat-icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="role-stat-copy">
+                <small>Total Orders</small>
+                <strong>{{ orders|length }}</strong>
+                <span>Orders received across all products.</span>
+            </div>
+        </article>
+        <article class="role-stat-card" data-tone="rose">
+            <div class="role-stat-icon"><i class="fas fa-tractor"></i></div>
+            <div class="role-stat-copy">
+                <small>My Farms</small>
+                <strong>{{ farms|length }}</strong>
+                <span>Farm locations attached to your listings.</span>
+            </div>
+        </article>
+        <article class="role-stat-card" data-tone="violet">
+            <div class="role-stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="role-stat-copy">
+                <small>Confirmed Orders</small>
+                <strong>{{ confirmed_orders_count }}</strong>
+                <span>Orders already accepted or completed.</span>
+            </div>
+        </article>
+    </section>
 
-<h3>My Products</h3>
-<table>
-    <thead><tr><th>Image</th><th>Name</th><th>Quantity</th><th>Unit</th><th>Price/unit</th><th>Orders</th><th>Actions</th></tr></thead>
-    <tbody>
-    {% for p in products %}
-        <tr>
-            <td>
-                {% if p.image %}
-                    <img src="{{ p.image.url }}" alt="{{ p.display_name }}" class="product-thumb">
-                {% else %}
-                    <span class="product-thumb product-thumb-placeholder">No image</span>
-                {% endif %}
-            </td>
-            <td>{{ p.display_name }}</td>
-            <td>{{ p.quantity }}</td>
-            <td>{{ p.unit }}</td>
-            <td>DA {{ p.price_per_unit }}</td>
-            <td>
-                {{ p.order_count }}
-            </td>
-            <td>
-                <a href="{% url 'edit_product' p.id %}" class="btn">Edit</a>
-                {% if p.order_count %}
-                    <span class="muted-note">Delete unavailable once orders exist.</span>
-                {% else %}
-                    <form method="post" action="{% url 'delete_product' p.id %}" onsubmit="return confirm('Delete this product?');">
-                        {% csrf_token %}
-                        <button type="submit">Delete</button>
-                    </form>
-                {% endif %}
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="7">No products added.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <section class="role-section-card">
+        <div class="role-section-head">
+            <div>
+                <h2>My Products</h2>
+                <p>Track stock, pricing, availability, and edit actions from one table.</p>
+            </div>
+        </div>
+        {% if products %}
+        <div class="role-section-body role-table-wrap">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Orders</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in products %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if p.image_url %}
+                                    <img src="{{ p.image_url }}" alt="{{ p.display_name }}" class="role-thumb">
+                                    {% else %}
+                                    <div class="role-thumb-fallback"><i class="fas fa-image"></i></div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ p.display_name }}</strong>
+                                        <div class="small text-muted">{{ p.unit }} listing</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-success-subtle text-success-emphasis">{{ p.category.name|default:"Uncategorized" }}</span></td>
+                            <td>{{ p.quantity }} {{ p.unit }}</td>
+                            <td><strong>DA {{ p.price_per_unit }}</strong></td>
+                            <td>
+                                {% if p.available %}
+                                <span class="status-badge status-delivered">Available</span>
+                                {% else %}
+                                <span class="status-badge status-cancelled">Unavailable</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-primary">{{ p.order_count }}</span></td>
+                            <td>
+                                <div class="role-action-group">
+                                    <a href="{% url 'edit_product' p.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                    {% if not p.order_count %}
+                                    <form method="post" action="{% url 'delete_product' p.id %}" onsubmit="return confirm('Delete this product?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="role-empty">
+            <i class="fas fa-box-open"></i>
+            <h4>No products yet</h4>
+            <p>Start selling by publishing your first product listing.</p>
+            <a href="{% url 'add_product' %}" class="btn btn-primary">Add Product</a>
+        </div>
+        {% endif %}
+    </section>
 
-<h3>Orders Received</h3>
-<table>
-    <thead><tr><th>Product</th><th>Quantity</th><th>Buyer</th><th>Status</th></tr></thead>
-    <tbody>
-    {% for order in orders %}
-        <tr><td>{{ order.product.name }}</td><td>{{ order.quantity }}</td><td>{{ order.buyer.username }}</td><td>{{ order.status }}</td></tr>
-    {% empty %}
-        <tr><td colspan="4">No orders yet.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <section class="role-section-card">
+        <div class="role-section-head">
+            <div>
+                <h2>My Farms</h2>
+                <p>Keep your production locations organized for pricing and delivery planning.</p>
+            </div>
+        </div>
+        <div class="role-section-body">
+            {% if farms %}
+            <div class="role-mini-grid">
+                {% for farm in farms %}
+                <article class="role-mini-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <h3><i class="fas fa-location-dot text-success me-2"></i>{{ farm.name }}</h3>
+                            <p>
+                                {% if farm.street %}{{ farm.street }}, {% endif %}
+                                {% if farm.city %}{{ farm.city }}, {% endif %}
+                                {% if farm.wilaya %}{{ farm.wilaya }}{% endif %}
+                                {% if farm.postal_code %} - {{ farm.postal_code }}{% endif %}
+                                {% if farm.location and not farm.street %}{{ farm.location }}{% endif %}
+                            </p>
+                            <small>Area: {% if farm.area_hectares %}{{ farm.area_hectares }} hectares{% else %}{{ farm.size_acres }} acres{% endif %}</small>
+                        </div>
+                        <div class="role-action-group" style="gap: 5px;">
+                            <a href="{% url 'edit_farm' farm.id %}" class="btn btn-sm btn-outline-primary" title="Edit farm"><i class="fas fa-edit"></i></a>
+                            <form method="post" action="{% url 'delete_farm' farm.id %}" onsubmit="return confirm('Delete this farm?');" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete farm"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="role-empty">
+                <i class="fas fa-tractor"></i>
+                <h4>No farms added yet</h4>
+                <p>Add your first farm to connect products with real production locations.</p>
+                <a href="{% url 'add_farm' %}" class="btn btn-outline-primary">Add Farm</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="role-section-card">
+        <div class="role-section-head">
+            <div>
+                <h2>Orders Received</h2>
+                <p>Monitor buyers, transport assignments, and final order interactions.</p>
+            </div>
+        </div>
+        {% if orders %}
+        <div class="role-section-body role-table-wrap">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Buyer</th>
+                            <th>Transporter</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Interactions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><strong>#{{ order.id }}</strong></td>
+                            <td>{{ order.product.display_name }}</td>
+                            <td>{{ order.quantity }} {{ order.product.unit }}</td>
+                            <td>
+                                <a href="{% url 'public_profile' order.buyer.id %}" class="text-decoration-none">{{ order.buyer.username }}</a>
+                                {% with summary=ratings_by_user|get_item:order.buyer.id %}
+                                <div class="small text-muted"><i class="fas fa-star text-warning"></i> {{ summary.avg|default:"No ratings" }}</div>
+                                {% endwith %}
+                            </td>
+                            <td>
+                                {% if order.delivery.transporter %}
+                                <a href="{% url 'public_profile' order.delivery.transporter.id %}" class="text-decoration-none">{{ order.delivery.transporter.username }}</a>
+                                {% with summary=ratings_by_user|get_item:order.delivery.transporter.id %}
+                                <div class="small text-muted"><i class="fas fa-star text-warning"></i> {{ summary.avg|default:"No ratings" }}</div>
+                                {% endwith %}
+                                {% else %}
+                                <span class="text-muted">Not assigned yet</span>
+                                {% endif %}
+                            </td>
+                            <td><strong>DA {{ order.total_price }}</strong></td>
+                            <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                            <td>{{ order.order_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if order.status == 'delivered' %}
+                                <div class="role-rating-forms">
+                                    <form method="post" action="{% url 'rate_user' order.id order.buyer.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            <select name="score" class="form-select">
+                                                <option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+                                            </select>
+                                            <button class="btn btn-outline-warning" type="submit">Rate buyer</button>
+                                        </div>
+                                    </form>
+                                    {% if order.delivery.transporter %}
+                                    <form method="post" action="{% url 'rate_user' order.id order.delivery.transporter.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            <select name="score" class="form-select">
+                                                <option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option>
+                                            </select>
+                                            <button class="btn btn-outline-warning" type="submit">Rate transporter</button>
+                                        </div>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <div class="small text-muted mb-2">Rating opens after delivery.</div>
+                                {% if order.status == 'pending' %}
+                                <div class="role-action-group">
+                                    <form method="post" action="{% url 'accept_order' order.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-success">Accept</button>
+                                    </form>
+                                    <form method="post" action="{% url 'reject_order' order.id %}" class="role-form-inline">
+                                        {% csrf_token %}
+                                        <input type="text" name="reason" placeholder="Reason (optional)" class="form-control form-control-sm" />
+                                        <button class="btn btn-sm btn-danger">Reject</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="role-empty">
+            <i class="fas fa-shopping-bag"></i>
+            <h4>No orders yet</h4>
+            <p>Buyer orders will appear here as soon as products start moving.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+  </div>
+</div>
 {% endblock %}

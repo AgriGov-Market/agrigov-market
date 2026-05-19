@@ -1,0 +1,95 @@
+{% extends 'marketplace/base.html' %}
+{% block page_title %}Orders{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-order-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/media/products/connor-gan-l2LhqIQMo04-unsplash.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 48px 20px;
+  }
+  .admin-order-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.12);
+    z-index: 0;
+  }
+  .admin-order-background .order-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .admin-order-background .card {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(255,255,255,0.24);
+    backdrop-filter: blur(10px);
+  }
+  .admin-order-background .card-header { background: rgba(255,255,255,0.72); }
+  .admin-order-background .table thead th,
+  .admin-order-background .table tbody td {
+    background: rgba(255,255,255,0.72);
+  }
+  .admin-order-background .table-hover tbody tr:hover {
+    background: rgba(255,255,255,0.88);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-order-background">
+  <div class="order-container">
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0"><i class="fas fa-clipboard-list text-success me-2"></i>All Orders</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order</th>
+                        <th>Buyer</th>
+                        <th>Farmer</th>
+                        <th>Transporter</th>
+                        <th>Total</th>
+                        <th>Delivery Fee</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }} - {{ order.product.display_name }}</td>
+                        <td><a href="{% url 'public_profile' order.buyer.id %}" class="text-decoration-none">{{ order.buyer.username }}</a></td>
+                        <td><a href="{% url 'public_profile' order.product.farmer.id %}" class="text-decoration-none">{{ order.product.farmer.username }}</a></td>
+                        <td>
+                            {% if order.delivery.transporter %}
+                                <a href="{% url 'public_profile' order.delivery.transporter.id %}" class="text-decoration-none">{{ order.delivery.transporter.username }}</a>
+                            {% else %}
+                                <span class="text-muted">Not assigned</span>
+                            {% endif %}
+                        </td>
+                        <td>DA {{ order.total_price }}</td>
+                        <td><strong class="text-success">DA {{ order.delivery.delivery_fee }}</strong></td>
+                        <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                        <td><a href="{% url 'admin_order_detail' order.id %}" class="btn btn-sm btn-outline-primary">Edit Fee</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted py-4">No orders yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+  </div>
+</div>
+{% endblock %}

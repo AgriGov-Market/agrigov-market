@@ -1,10 +1,209 @@
 {% extends 'marketplace/base.html' %}
+{% block page_title %}Add Product{% endblock %}
+
+{% block extra_css %}
+<style>
+  .farmer-page-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/media/products/5789403159968026335_121.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 48px 20px;
+  }
+  .farmer-page-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.12);
+    z-index: 0;
+  }
+  .farmer-page-background .farmer-content-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .farmer-page-background .card {
+    background: rgba(255,255,255,0.78);
+    border-color: rgba(255,255,255,0.24);
+    backdrop-filter: blur(10px);
+  }
+  .farmer-page-background .card-body { background: transparent; }
+  .farmer-page-background .form-control,
+  .farmer-page-background .form-select,
+  .farmer-page-background textarea {
+    background: rgba(255,255,255,0.9);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Add Product</h2>
-<p>Choose one of the ministry-approved product categories below.</p>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Product</button>
-</form>
+<div class="farmer-page-background">
+  <div class="farmer-content-container">
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body p-4">
+                <h4 class="mb-4"><i class="fas fa-plus-circle text-success me-2"></i>Add New Product</h4>
+                <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-4">
+                    <p class="text-muted mb-0">Choose from ministry-approved product categories.</p>
+                    <a href="{% url 'official_prices' %}" class="btn btn-outline-success">
+                        <i class="fas fa-tags me-2"></i>View Market Prices
+                    </a>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Product Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Category</label>
+                            {{ form.main_category }}
+                            {% if form.main_category.errors %}
+                                <div class="text-danger small">{{ form.main_category.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Subcategory</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger small">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Price per Unit (DZD)</label>
+                            {{ form.price_per_unit }}
+                            <div id="price-range-info" class="alert alert-info mt-2 d-none" role="status"></div>
+                            {% if form.price_per_unit.help_text %}
+                                <div class="form-text">{{ form.price_per_unit.help_text }}</div>
+                            {% endif %}
+                            {% if form.price_per_unit.errors %}
+                                <div class="text-danger small">{{ form.price_per_unit.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unit</label>
+                            {{ form.unit }}
+                            {% if form.unit.errors %}
+                                <div class="text-danger small">{{ form.unit.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Available Quantity</label>
+                            {{ form.quantity }}
+                            {% if form.quantity.errors %}
+                                <div class="text-danger small">{{ form.quantity.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Farm</label>
+                            {{ form.farm }}
+                            {% if form.farm.errors %}
+                                <div class="text-danger small">{{ form.farm.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Product Images</label>
+                            {{ form.images }}
+                            <div class="form-text">You can upload multiple images for this product.</div>
+                            {% if form.images.errors %}
+                                <div class="text-danger small">{{ form.images.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="fas fa-save me-2"></i>Save Product
+                        </button>
+                        <a href="{% url 'farmer_dashboard' %}" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const categoryData = JSON.parse('{{ categories_json|escapejs }}');
+    const mainSelect = document.getElementById('id_main_category');
+    const subSelect = document.getElementById('id_category');
+    const priceInfo = document.getElementById('price-range-info');
+
+    function setOptions(mainId, selectedSubId) {
+        const parent = categoryData.find(item => item.id === Number(mainId));
+        let html = '<option value="">Select a subcategory</option>';
+        if (!parent) {
+            subSelect.innerHTML = html;
+            updatePriceInfo(null);
+            return;
+        }
+        if (parent.children.length === 0) {
+            html += `<option value="${parent.id}"${selectedSubId === parent.id ? ' selected' : ''}>${parent.name}</option>`;
+        } else {
+            parent.children.forEach(child => {
+                const selected = selectedSubId === child.id ? ' selected' : '';
+                html += `<option value="${child.id}"${selected}>${child.name}</option>`;
+            });
+        }
+        subSelect.innerHTML = html;
+        updatePriceInfo(subSelect.value ? Number(subSelect.value) : null);
+    }
+
+    function updatePriceInfo(categoryId) {
+        if (!categoryId) {
+            priceInfo.classList.add('d-none');
+            priceInfo.textContent = '';
+            return;
+        }
+        let selected = null;
+        categoryData.forEach(parent => {
+            if (parent.id === categoryId) selected = parent;
+            if (!selected) {
+                const child = parent.children.find(item => item.id === categoryId);
+                if (child) selected = child;
+            }
+        });
+        if (!selected || !selected.min_price || !selected.max_price) {
+            priceInfo.classList.add('d-none');
+            priceInfo.textContent = '';
+            return;
+        }
+        priceInfo.textContent = `Price range: DA ${selected.min_price} - DA ${selected.max_price}`;
+        priceInfo.classList.remove('d-none');
+    }
+
+    mainSelect.addEventListener('change', function() {
+        setOptions(this.value, null);
+    });
+
+    subSelect.addEventListener('change', function() {
+        updatePriceInfo(this.value ? Number(this.value) : null);
+    });
+
+    setOptions(mainSelect.value, subSelect.value ? Number(subSelect.value) : null);
+})();
+</script>
+  </div>
+</div>
 {% endblock %}
